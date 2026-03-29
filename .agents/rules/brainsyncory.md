@@ -1,7 +1,7 @@
 
 
-# Project Memory — MyAgentSkills
-> 127 notes | Score threshold: >40
+# Project Memory — My-Agent-Skills
+> 91 notes | Score threshold: >40
 
 ## Safety — Never Run Destructive Commands
 
@@ -18,27 +18,27 @@
 
 **Stack:** Unknown stack
 
-## 📝 NOTE: 1 uncommitted file(s) in working tree.\n\n## Project Standards
+## 📝 NOTE: 1 uncommitted file(s) in working tree.\n\n## Active: `.`
 
-- convention in OPERATING_RULES.md
-- problem-fix in task.md — confirmed 5x
-- convention in validate-assets.sh
-- Strengthened types Audit
-- convention in audit_report.md
-- Strengthened types Security
-- what-changed in task.md — confirmed 7x
-- what-changed in SKILL.md — confirmed 5x
+- **convention in manifest.yaml**
+- **Added session cookies authentication — confirmed 4x**
+- **convention in manifest.yaml**
+- **convention in manifest.yaml**
+- **Added session cookies authentication — prevents XSS injection attacks — confirmed 3x**
 
-## Recent Decisions
+## Project Standards
 
-- decision in manifest.yaml
-- Optimized Goal — introduces API versioning for backward compatibility
+- convention in manifest.yaml
+- Added session cookies authentication — confirmed 4x
+- convention in manifest.yaml
+- convention in manifest.yaml
+- Added session cookies authentication — prevents XSS injection attacks — confirmed 3x
+- convention in SKILL.md
+- Version your API from day 1 (/api/v1/)
+- Use consistent response format across all endpoints
 
-## Learned Patterns
+## Verified Best Practices
 
-- Always: convention in .gitignore (seen 2x)
-- Always: Strengthened types Goal (seen 2x)
-- Always: convention in .gitignore (seen 4x)
 - Agent generates new migration for every change (squash related changes)
 - Agent installs packages without checking if already installed
 

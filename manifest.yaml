@@ -160,8 +160,8 @@ agents:
     name: "Community Manager"
     persona: "Skills/Roles/Management/community-manager.md"
     skills:
-      - "Skills/Global/changelog"
-      - "Skills/Global/patch-notes"
+      - "Skills/Roles/Management/changelog"
+      - "Skills/Roles/Management/patch-notes"
 
   # ═══════════════════════════════════════════
   # SPECIALIST — SECURITY
@@ -228,10 +228,8 @@ groups:
     - "Skills/Global/task-hub"
     - "Skills/Global/brainstorm"
     - "Skills/Global/onboard"
-    - "Skills/Global/changelog"
     - "Skills/Global/start"
-    - "Skills/Global/patch-notes"
     - "Skills/Global/scope-check"
     - "Skills/Global/project-stage-detect"
     - "Skills/Global/Evolution"
-    - "Skills/Global/.agents/rules/security.md"
+    - "Skills/Global/security-rules"
