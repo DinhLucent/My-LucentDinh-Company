@@ -37,6 +37,7 @@ MyAgentSkills/
 ├── manifest.yaml           ← Sổ cái nhân sự (Agent → Persona → Skills)
 ├── DASHBOARD.md            ← 📊 Quick Context + Task Board + Timeline
 ├── ONBOARDING.md           ← Checklist nhận việc cho Agent mới
+├── OFFBOARDING.md          ← Checklist sa thải / rút lui Agent
 ├── RECRUITMENT.md          ← Quy trình thuê Agent mới
 ├── OPERATING_RULES.md      ← Quy tắc vận hành (tóm tắt)
 ├── .hub/                   ← 🏗️ TASK HUB

@@ -27,6 +27,7 @@
 | **Sprint mới** | `producer-agent` | `/sprint-plan` → Tasks mới vào Hub |
 | **Release** | `release-manager-agent` | `/release-checklist` → deploy → monitor |
 | **Thiếu role** | AI tự báo → Bạn mở session mới | Thuê Agent mới theo `RECRUITMENT.md` |
+| **Xong việc (Sa thải)** | `producer-agent` | "Chạy OFFBOARDING cho [agent-id]" |
 | **Code review** | `lead-programmer-agent` | `/code-review` |
 | **Security audit** | `security-agent` | `/deep-scan` |
 | **Performance issue** | `performance-analyst-agent` | `/perf-profile` |
