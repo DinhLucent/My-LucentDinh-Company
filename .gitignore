@@ -28,7 +28,7 @@ temp-*/
 tmp/
 dist/
 build/
-
+refs_github
 # Auto-generated agent rules (personalized per developer)
 .brainsync/agent-rules.md
 

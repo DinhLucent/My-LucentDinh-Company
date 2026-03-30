@@ -207,6 +207,7 @@ Bạn (CEO)
 - **Task Hub là Single Source of Truth** — Mọi task qua Hub
 - **Diamond Standard** — Output rõ ràng, có cấu trúc, chuyên nghiệp
 - **Verify trước Done** — Review trước Merge — Test trước Deploy
+- **STRESS Monitoring** — Tự theo dõi mức bộ ngộp context và độ mệt mỏi của Agent
 
 ### Tài liệu tham khảo
 

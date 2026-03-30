@@ -22,12 +22,9 @@ description: "Task Hub Protocol — How Agents pick up, execute, and return task
 
 ## Step 0: BOOT SEQUENCE (every new session)
 
-> ⚠️ **Order matters. Do NOT skip to Dashboard.**
+> ⚠️ **Follow the standard Boot Sequence in `ONBOARDING.md`.**
+> Order: ONBOARDING → OPERATING_RULES → task-hub → Dashboard → backlog → Work.
 
-1. Read `ONBOARDING.md` → Confirm your identity, load persona, load rules
-2. Read `DASHBOARD.md` → Quick Context (phase, progress, last agent)
-3. Check `.hub/handoffs/` → Any pending handoffs for you?
-4. Read `.hub/backlog.yaml` → Find task with `assigned_role` = your Agent ID
 
 ---
 
@@ -94,10 +91,10 @@ In `backlog.yaml`, find tasks where:
 4. Update `DASHBOARD.md`:
    - Move task to DONE list
    - Update `Quick Context` progress
-   - **Evaluate and Update your Status (Context)** in the Active Team table:
-     - 🟢 **Optimal**: Normal operation, light context.
-     - 🟡 **High Load**: Read many large files or long debugging session.
-     - 🔴 **Exhausted**: Context limit reached or losing focus. You MUST ask CEO to restart your session.
+   - **Evaluate and Update your Status (Stress %)** in the Active Team table per `OPERATING_RULES.md` §5:
+     - **🟢 < 30% (Optimal)**: Normal operation, light context.
+     - **🟡 30-65% (High Load)**: Growing context, nearing decision fatigue.
+     - **🟠🔴 > 65% (Exhaustion)**: Critical load. Must STOP and Handoff.
    - **Quick Context**: progress %, last agent, 1-line summary
    - **Tasks**: move to DONE
    - **Timeline**: add 1 line (`[date] agent — COMPLETED: description`)

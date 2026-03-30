@@ -44,7 +44,7 @@ Nếu đây là lần đầu bạn sử dụng Company này, hãy đi theo lộ 
 | **New Sprint** | `producer-agent` | `/sprint-plan` → New tasks to Hub |
 | **Release** | `release-manager-agent` | `/release-checklist` → deploy → monitor |
 | **Missing Role** | AI reports automatically → Open new session | Hire new Agent per `RECRUITMENT.md` |
-| **Agent Exhausted** | AI shows 🔴 status in Dashboard | Close current session → Open new session for same role |
+| **Agent Exhausted** | AI shows >65% STRESS in Dashboard | Close current session → Open new session for same role |
 | **Task Done (Fire)** | `producer-agent` | "Run OFFBOARDING for [agent-id]" |
 | **Code Review** | `lead-programmer-agent` | `/code-review` |
 | **Security Audit** | `security-agent` | `/deep-scan` |
@@ -161,7 +161,7 @@ Open `DASHBOARD.md` → View:
 | Tình huống | Hành động |
 | :--- | :--- |
 | Giai đoạn DESIGN xong, không cần `cto-agent` nữa | Nói với `producer-agent`: *"Run OFFBOARDING for cto-agent"* → AI xóa khỏi `active_agents` |
-| Agent đang 🔴 Exhausted (context đầy) | Đóng session → Mở session mới cùng agent ID đó |
+| Agent đang 🟠/🔴 Exhausted (>65% STRESS) | Đóng session → Mở session mới cùng agent ID đó |
 | Task xong hẳn, Agent không cần nữa | Offboard → Giảm token mỗi session |
 
 ---

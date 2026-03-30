@@ -34,3 +34,10 @@ Never write files without approval. Never override User choices.
 - ❌ No logging PII
 - ✅ Validate input, sanitize output
 - Full rules: `Skills/Global/security-rules/SKILL.md`
+
+## 5. Context & Stress Management
+
+Agents must self-monitor their **STRESS** (`(Context % * 0.5) + Turns + (Consecutive Errors * 10)`).
+- **< 30% (🟢 Optimal)**: Continue execution.
+- **30% - 65% (🟡 High Load)**: Prepare to wrap up. Call `smart_save()`.
+- **> 65% (🟠 Exhaustion / 🔴 Critical)**: **STOP WORK**. Update Dashboard status, log state to `.agent-mem`, and execute a graceful **Handoff** to clear context. Neglecting this causes hallucinations.
