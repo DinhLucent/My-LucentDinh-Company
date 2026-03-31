@@ -1,7 +1,7 @@
 # 🏢 LucentDinhCompany — Trung Tâm Điều Hành Agent AI
 
 > **Mục tiêu:** Biến session AI của bạn thành một phòng ban phát triển phần mềm chuyên nghiệp.
-> **Version:** 3.1 | **Framework:** Diamond Standard + Task Hub
+> **Version:** 3.2 | **Framework:** Diamond Standard + Task Hub
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## 1. Tổng quan
 
-**LucentDinhCompany** là **Trụ sở chính (HQ)** của một đội ngũ AI Agent chuyên nghiệp. Thay vì một AI đơn lẻ làm mọi việc, hệ thống cung cấp **27 "nhân viên" AI** với Persona và kỹ năng riêng biệt.
+**LucentDinhCompany** là **Trụ sở chính (HQ)** của một đội ngũ AI Agent chuyên nghiệp. Thay vì một AI đơn lẻ làm mọi việc, hệ thống cung cấp **27 "nhân viên" AI** với Persona và kỹ năng riêng biệt, được trang bị các bộ Skill chuyên sâu (như UI/UX Pro Max cho thiết kế giao diện).
 
 Bạn vẫn là CEO — người ra quyết định cuối cùng.
 
@@ -48,6 +48,8 @@ LucentDinhCompany/
 ├── Skills/
 │   ├── Global/             ← Skills chung (task-hub, security, evolution...)
 │   └── Roles/              ← Skills chuyên môn theo phòng ban
+├── .skills_pool/            ← 🧰 Kho Skill mở rộng (bên thứ 3)
+│   └── ui-ux-pro-max/      ← Design Intelligence (67 styles, 161 palettes)
 └── templates/              ← Khuôn mẫu task, handoff, skill
 ```
 
@@ -171,8 +173,9 @@ Tier 2 — Department Leads (Sonnet / GPT-4o-mini)
   Product Manager • Lead Programmer • QA Lead • UX Designer • Release Manager
 
 Tier 3 — Specialists (Sonnet / Gemini Flash)
-  Backend • Frontend • Fullstack • AI • Network • Tools • UI
-  Security • DevOps • Data Engineer
+  Backend • Frontend • Fullstack • AI • Network • Tools
+  UI Programmer 🎨 • Security • DevOps • Data Engineer
+  (UI Programmer & UX Designer được trang bị UI/UX Pro Max v2.5)
 
 Tier 4 — Executors (Haiku / Flash)
   QA Tester • Community Manager • Analytics Engineer
@@ -197,6 +200,7 @@ Bạn (CEO)
 | **Code** | `/code-review` `/api-design` `/db-review` `/tech-debt` `/perf-profile` |
 | **Sprint** | `/sprint-plan` `/estimate` `/retrospective` `/release-checklist` `/changelog` |
 | **Team** | `/team-feature` `/team-backend` `/team-frontend` `/team-ui` `/team-release` |
+| **Design** | `/design-system` `/design-review` — tự động dùng UI/UX Pro Max engine |
 | **Security** | `/deep-scan` `/secret-audit` `/threat-model` |
 
 ---
@@ -217,6 +221,7 @@ Bạn (CEO)
 | `ONBOARDING.md` | Checklist nhận việc (30 dòng) |
 | `RECRUITMENT.md` | Quy trình thuê Agent mới |
 | `Skills/Global/task-hub/SKILL.md` | Protocol Hub chi tiết |
+| `.skills_pool/ui-ux-pro-max/SKILL.md` | Design Intelligence (67 styles, 161 palettes, 57 fonts) |
 
 ---
 *Chúc bạn xây dựng được đội ngũ AI hùng mạnh! 🚀*

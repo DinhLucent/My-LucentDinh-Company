@@ -14,6 +14,8 @@ active_agents:
   - "security-agent"
   - "qa-lead-agent"
   - "producer-agent"
+  - "ui-programmer-agent"
+  - "ux-designer-agent"
   # Add/remove agents as needed per project
 
 agents:
@@ -85,6 +87,7 @@ agents:
       - "Skills/Roles/Development/design-system"
       - "Skills/Roles/Development/team-ui"
       - "Skills/Roles/Development/localize"
+      - ".skills_pool/ui-ux-pro-max"
 
   - id: "ai-programmer-agent"
     name: "AI Programmer"
@@ -203,6 +206,7 @@ agents:
     skills:
       - "Skills/Roles/Development/design-system"
       - "Skills/Roles/Development/design-review"
+      - ".skills_pool/ui-ux-pro-max"
 
   - id: "ux-researcher-agent"
     name: "UX Researcher"

@@ -40,4 +40,16 @@ Never write files without approval. Never override User choices.
 Agents must self-monitor their **STRESS** (`(Context % * 0.5) + Turns + (Consecutive Errors * 10)`).
 - **< 30% (🟢 Optimal)**: Continue execution.
 - **30% - 65% (🟡 High Load)**: Prepare to wrap up. Call `smart_save()`.
-- **> 65% (🟠 Exhaustion / 🔴 Critical)**: **STOP WORK**. Update Dashboard status, log state to `.agent-mem`, and execute a graceful **Handoff** to clear context. Neglecting this causes hallucinations.
+- **> 65% (🟠🔴 Critical)**: **STOP WORK** → Update Dashboard → Handoff → Reset session.
+
+### Update Triggers (MANDATORY)
+
+Update your row in `DASHBOARD.md` Active Team table at these moments:
+
+| When | State | Stress Action |
+|------|-------|---------------|
+| Task Start | 🔵 Active | Set baseline (~20) |
+| Task Complete | 🟢 Ready | Reset to ~10, write summary in Notes |
+| Error/Blocked | 🟠 Blocked | +15 per failure, note the blocker |
+| Long session (many turns) | — | +10 periodic |
+| Stress > 65% | 🔴 Critical | **STOP** → write `handover.md` → request session reset |

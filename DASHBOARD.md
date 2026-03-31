@@ -26,9 +26,9 @@
 
 > **Note for CEO:** Agents assigned from `manifest.yaml`. Ping by role name.
 
-| Agent ID | Role | Department | Status (Stress) |
-|----------|------|------------|-----------------|
-| _(no agents assigned)_ | | | |
+| Agent ID | Role | Current Task | Stress (0-100) | State | Notes |
+|----------|------|--------------|----------------|-------|-------|
+| _(no agents)_ | | | | | |
 
 ---
 
