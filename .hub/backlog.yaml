@@ -1,32 +1,1293 @@
-# ═══════════════════════════════════════════════════════════
-# TASK HUB — BACKLOG (Central Task Queue)
-# ═══════════════════════════════════════════════════════════
+﻿# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# TASK HUB â€” BACKLOG (Central Task Queue)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #
+# Project: LabConnector â€” Analyzer Gateway
 # This is the ONLY place to create and distribute tasks to Agents.
 # Each task MUST specify assigned_role. Only matching Agent can claim.
 #
 # Status: todo | claimed | in_progress | in_review | done | blocked
 # Priority: critical | high | medium | low
-# ═══════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-project: ""          # ← Project name
+project: "LabConnector â€” Analyzer Gateway"
 sprint: 1
-created_by: "user"   # user | producer-agent | cto-agent
+created_by: "cto-agent"
 
 tasks:
-  # ─── Example task (delete when using for real) ───
-  # - id: "TASK-001"
-  #   title: "Design database schema for Patient"
-  #   description: "Create ERD and migration for patients, appointments, records tables"
-  #   assigned_role: "backend-agent"       # ← ONLY this agent can claim
-  #   priority: "high"
-  #   status: "todo"
-  #   dependencies: []                     # Task IDs that must be done first
-  #   created_at: "2026-03-29T13:30:00"
-  #   deadline: "2026-03-31"
-  #   acceptance_criteria:
-  #     - "Schema has patients table with ≥8 fields"
-  #     - "Migration script runs on PostgreSQL"
-  #     - "Indexes created for common queries"
-  #   output_files: []                     # Agent fills when completed
-  #   notes: "See ADR-001 for PostgreSQL decision"
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  # SPRINT 1 â€” Core Framework + CA270
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+  - id: "TASK-001"
+    title: "Create ADR-0001: Plugin Architecture Decision"
+    description: "Document the architecture decision for plugin-based analyzer gateway. Cover 4-layer design (transportâ†’messageâ†’workflowâ†’mapping), plugin contract (AnalyzerPlugin ABC), config-driven approach, and Python stack rationale."
+    assigned_role: "cto-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: []
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-29T23:57:00+07:00"
+    deadline: "2026-03-30"
+    acceptance_criteria:
+      - "âœ… ADR follows standard format (Context, Decision, Alternatives, Consequences)"
+      - "âœ… 4-layer architecture documented with diagrams"
+      - "âœ… Plugin contract (ABC) specified"
+      - "âœ… Python stack choice justified"
+      - "Saved to docs/architecture/adr-0001-plugin-architecture.md"
+    output_files: ["packages/lab-connector/docs/architecture/adr-0001-plugin-architecture.md"]
+    notes: "Reference: idea_analyzerconnector.md, implementation_plan.md"
+
+  - id: "TASK-002"
+    title: "Scaffold lab-connector project structure"
+    description: "Create the full project directory structure with pyproject.toml, requirements.txt, folder hierarchy for core/, transport/, protocol/, workflow/, mapping/, dispatch/, storage/, dashboard/, plugins/. Include __init__.py files and empty module stubs."
+    assigned_role: "backend-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: ["TASK-001"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T00:20:00+07:00"
+    deadline: "2026-04-02"
+    acceptance_criteria:
+      - "Project structure matches implementation_plan.md"
+      - "pyproject.toml with all dependencies"
+      - "All __init__.py files created"
+      - "Plugin template in plugins/_template/"
+      - "Config YAML templates in config/"
+      - "pytest runs (even if 0 tests)"
+    output_files: ["packages/lab-connector/pyproject.toml", "packages/lab-connector/src/lab_connector/", "packages/lab-connector/plugins/"]
+    notes: "Python 3.11+, use uv or pip for dependency management"
+
+  - id: "TASK-003"
+    title: "Build AnalyzerPlugin base class + data models"
+    description: "Implement the AnalyzerPlugin ABC in src/core/plugin_base.py with all abstract methods. Create ParsedResult, ResultComponent, ConnectionType, ResultType data models using dataclasses/pydantic."
+    assigned_role: "backend-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: ["TASK-002"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T00:25:00+07:00"
+    deadline: "2026-04-04"
+    acceptance_criteria:
+      - "AnalyzerPlugin ABC with all methods from implementation_plan.md"
+      - "ParsedResult dataclass with all fields"
+      - "ConnectionType and ResultType enums"
+      - "Type hints on all methods"
+      - "Unit tests for data models"
+    output_files: ["packages/lab-connector/src/lab_connector/core/models.py", "packages/lab-connector/src/lab_connector/core/plugin_base.py"]
+    notes: "This is the contract ALL plugins must implement"
+
+  - id: "TASK-004"
+    title: "Build Transport layer (Serial + TCP)"
+    description: "Implement base_transport.py ABC, serial_transport.py (pyserial async wrapper), and tcp_transport.py (asyncio TCP server/client). Each transport must emit raw bytes to the pipeline."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-003"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T00:36:00+07:00"
+    deadline: "2026-04-07"
+    acceptance_criteria:
+      - "BaseTransport ABC with connect/disconnect/send/receive"
+      - "SerialTransport wraps pyserial with async read loop"
+      - "TcpTransport supports both server (listen) and client (connect) modes"
+      - "Auto-reconnect with exponential backoff"
+      - "Connection state tracking (DISCONNECTEDâ†’CONNECTEDâ†’ERRORâ†’RETRY)"
+      - "Unit tests with mock serial port"
+    output_files: ["packages/lab-connector/src/lab_connector/transport/base_transport.py", "packages/lab-connector/src/lab_connector/transport/serial_transport.py", "packages/lab-connector/src/lab_connector/transport/tcp_transport.py"]
+    notes: "Extract serial code from CA270 repo"
+
+  - id: "TASK-005"
+    title: "Build ASTM E1381 frame codec"
+    description: "Implement ASTM E1381 framing: STX/ETX/EOT/ENQ/ACK/NAK, checksum calculation, frame assembly/disassembly. Extract from existing CA270 code."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-004"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T00:41:00+07:00"
+    deadline: "2026-04-09"
+    acceptance_criteria:
+      - "Frame encode/decode with checksum validation"
+      - "Multi-frame message reassembly"
+      - "Control character handling (ENQ, ACK, NAK, EOT)"
+      - "Unit tests with known-good ASTM frames from CA270"
+    output_files: ["packages/lab-connector/src/lab_connector/protocol/astm_frame.py", "packages/lab-connector/src/lab_connector/protocol/astm_codec.py"]
+    notes: "Refactor from ca270_lis_checker.py"
+
+  - id: "TASK-006"
+    title: "Refactor CA270 code into first plugin"
+    description: "Take existing SimulationLIS-CA270 code and refactor into plugins/ca270/ following the AnalyzerPlugin contract. Include CA270-specific parsing, ACK building, test code mapping."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-005"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T00:48:00+07:00"
+    deadline: "2026-04-11"
+    acceptance_criteria:
+      - "plugins/ca270/plugin.py implements AnalyzerPlugin"
+      - "CA270-specific message parsing works"
+      - "ACK/NAK building works"
+      - "Test code mapping via YAML config"
+      - "CA270 simulator works as test harness"
+      - "All existing CA270 functionality preserved"
+    output_files: ["packages/lab-connector/plugins/ca270/plugin.py", "packages/lab-connector/plugins/ca270/parser.py", "packages/lab-connector/plugins/ca270/test_code_map.yaml"]
+    notes: "Clone from https://github.com/DinhLucent/SimulationLIS-CA270"
+
+  - id: "TASK-007"
+    title: "Build RawStore (SQLite message persistence)"
+    description: "Implement raw message storage: SQLite database for parsed messages/status/retry queue, plus raw file storage for original bytes. Immutable writes only."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-003"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T00:55:00+07:00"
+    deadline: "2026-04-09"
+    acceptance_criteria:
+      - "SQLite DB with tables: raw_inbound, raw_outbound, connection_session, replay_queue"
+      - "Raw bytes saved to file system (data/raw/)"
+      - "Immutable writes (no UPDATE on raw messages)"
+      - "Query methods for dashboard (last N messages, by analyzer, by status)"
+      - "Unit tests"
+    output_files: ["packages/lab-connector/src/lab_connector/storage/raw_store.py", "packages/lab-connector/src/lab_connector/storage/file_store.py"]
+    notes: "See idea_analyzerconnector.md for full table list"
+
+  - id: "TASK-008"
+    title: "Build MirthDispatcher (HTTP to Mirth 4.6)"
+    description: "Implement upstream dispatcher that sends parsed results to Mirth Connect 4.6 via HTTP POST. Include retry with backoff, offline fallback to local JSON files."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-007"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T01:01:00+07:00"
+    deadline: "2026-04-11"
+    acceptance_criteria:
+      - "HTTP POST to Mirth channel endpoint"
+      - "Retry with exponential backoff (max 5 retries)"
+      - "Dead-letter queue for permanently failed messages"
+      - "Offline fallback: save to JSON file when Mirth unreachable"
+      - "Auto-sync queued messages when Mirth comes back online"
+      - "Integration test with Mirth mock"
+    output_files: ["packages/lab-connector/src/lab_connector/dispatch/mirth_dispatcher.py", "packages/lab-connector/src/lab_connector/dispatch/offline_queue.py"]
+    notes: "Mirth 4.6 HTTP Listener channel"
+
+  - id: "TASK-009"
+    title: "Build PluginManager (discover/load/lifecycle)"
+    description: "Implement plugin discovery from plugins/ folder, dynamic loading, lifecycle management (initâ†’startâ†’stopâ†’health), and per-analyzer YAML config binding."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-003"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T01:05:00+07:00"
+    deadline: "2026-04-09"
+    acceptance_criteria:
+      - "Discover plugins from plugins/ directory"
+      - "Load plugin by name from analyzer config YAML"
+      - "Plugin lifecycle: initialize â†’ start â†’ stop â†’ healthCheck"
+      - "Config binding: analyzer YAML â†’ PluginConfig"
+      - "Multiple instances of same plugin (e.g., 2x CA270 on different ports)"
+      - "Unit tests with mock plugin"
+    output_files: ["packages/lab-connector/src/lab_connector/plugin_manager.py", "packages/lab-connector/config/analyzers/ca270-lab-1.yaml"]
+    notes: ""
+
+    assigned_role: "fullstack-agent"
+    priority: "medium"
+    status: "done"
+    dependencies: ["TASK-007", "TASK-009"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T01:45:00+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "âœ… FastAPI serves on localhost:8088"
+      - "âœ… Dashboard shows per-analyzer status (green/yellow/red)"
+      - "âœ… Message log viewer (last 100)"
+      - "âœ… Error/alert panel"
+      - "âœ… Responsive HTML (works on any browser)"
+    output_files: ["src/lab_connector/dashboard/server.py", "src/lab_connector/dashboard/static/", "tests/test_dashboard.py"]
+    notes: "Lightweight, no React/Vue needed"
+
+  - id: "TASK-011"
+    title: "Security review: transport + data storage"
+    description: "Review transport layer (serial/TCP) and data storage (SQLite, raw files) for security concerns. Check: no plaintext secrets in config, proper file permissions, VLAN recommendations for analyzer network."
+    assigned_role: "security-agent"
+    priority: "medium"
+    status: "done"
+    dependencies: ["TASK-004", "TASK-007"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T02:00:00+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "Security review report created"
+      - "No secrets in YAML configs (or encrypted)"
+      - "SQLite DB file permissions documented"
+      - "Network segmentation recommendations for analyzer VLAN"
+      - "Audit logging verification"
+    output_files: ["MyTeam/.hub/done/TASK-011-security-report.md"]
+    notes: "Reference CLSI AUTO11 for IVD security requirements"
+
+  - id: "TASK-012"
+    title: "QA: test plan + simulator integration tests"
+    description: "Create test plan for gateway, set up CA270 simulator as automated test harness, define test scenarios (normal flow, timeout, duplicate, reconnect, bad barcode)."
+    assigned_role: "qa-lead-agent"
+    priority: "medium"
+    status: "done"
+    dependencies: ["TASK-006"]
+    created_at: "2026-03-29T23:50:00+07:00"
+    completed_at: "2026-03-30T02:15:00+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "Test plan document with all scenarios from idea_analyzerconnector.md"
+      - "CA270 simulator integrated as pytest fixture"
+      - "Automated tests: normal flow, timeout, duplicate, reconnect"
+      - "Coverage target: â‰¥80% for core modules"
+    output_files: ["packages/lab-connector/docs/qa/test_plan_v1.md", "packages/lab-connector/tests/test_ca270_integration.py"]
+    notes: "Reference CLSI AUTO08 for validation requirements"
+
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  # SPRINT 2 â€” Stage Queue Pipeline + Connector Capabilities
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+  - id: "TASK-013"
+    title: "ADR review: confirm Sprint 2 scope & architecture alignment"
+    description: "CTO reviews ADR-0002 and ADR-0003 against Sprint 1 codebase. Confirm stage_queue schema, StageWorker interface, ConnectorCapabilities dataclass, InputAdapter ABC, and graceful shutdown/recovery design are aligned with current code. Output: scope confirmation document."
+    assigned_role: "cto-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: []
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T00:10:00+07:00"
+    deadline: "2026-03-31"
+    acceptance_criteria:
+      - "ADR-0002 and ADR-0003 reviewed against Sprint 1 code"
+      - "ConnectorCapabilities dataclass fields confirmed"
+      - "stage_queue schema validated (no conflicts with raw_store)"
+      - "StageWorker interface specified"
+      - "Scope confirmation written to .hub/done/TASK-013.md"
+    output_files: []
+    notes: "CTO task â€” architecture alignment check before backend work begins"
+
+  - id: "TASK-014"
+    title: "Build StageQueue (SQLite persistent queue) + StageWorker base class"
+    description: "Implement stage_queue table in SQLite (per ADR-0003 schema) and generic StageWorker async class with claim/process/complete/fail loop, lease management, and expired lease recovery."
+    assigned_role: "backend-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: ["TASK-013"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T00:55:00+07:00"
+    deadline: "2026-04-04"
+    acceptance_criteria:
+      - "âœ… stage_queue table created with all columns from ADR-0003"
+      - "âœ… StageQueue class: enqueue(), claim_next(), complete(), fail(), recover_expired_leases()"
+      - "âœ… Lease model with lease_expires_at"
+      - "âœ… Typed retry: transient/config/permanent error classes"
+      - "âœ… Performance indexes created"
+      - "âœ… Unit tests in tests/test_stage_queue.py (21 tests)"
+      - "âœ… Unit tests in tests/test_stage_worker.py (12 tests)"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/storage/stage_queue.py"
+      - "packages/lab-connector/src/lab_connector/core/stage_worker.py"
+      - "packages/lab-connector/tests/test_stage_queue.py"
+      - "packages/lab-connector/tests/test_stage_worker.py"
+    notes: "Core infrastructure â€” DONE. TASK-016/017 can now proceed."
+
+    status: "done"
+    dependencies: ["TASK-013"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T01:10:00+07:00"
+    deadline: "2026-04-04"
+    acceptance_criteria:
+      - "âœ… ConnectorCapabilities dataclass with all fields"
+      - "âœ… get_capabilities() added to AnalyzerPlugin ABC"
+      - "âœ… CA270 plugin implements get_capabilities()"
+      - "âœ… Unit tests in tests/test_capabilities.py"
+      - "âœ… Existing tests still pass (Fixed MockPlugins)"
+    output_files: ["packages/lab-connector/src/lab_connector/core/capabilities.py"]
+    notes: "Lightweight change â€” can be done in parallel with TASK-014"
+
+  - id: "TASK-016"
+    title: "Build ParseWorker + MapWorker"
+    description: "Implement concrete StageWorker subclasses for parse and map stages."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-014"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T01:20:00+07:00"
+    deadline: "2026-04-07"
+    acceptance_criteria:
+      - "âœ… ParseWorker: parse stage â†’ map stage"
+      - "âœ… MapWorker: map stage â†’ dispatch stage"
+      - "âœ… Typed error handling"
+      - "âœ… Pipeline flow test: parse â†’ map â†’ dispatch"
+      - "âœ… 4 unit tests â€” all pass"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/workflow/parse_worker.py"
+      - "packages/lab-connector/src/lab_connector/workflow/map_worker.py"
+      - "packages/lab-connector/tests/test_pipeline_workers.py"
+    notes: "map_results() handles both sync and async via asyncio.iscoroutine()"
+
+  - id: "TASK-017"
+    title: "Build DispatchWorker (replace OfflineQueue)"
+    description: "Implement DispatchWorker as StageWorker subclass for stage='dispatch'. Sends to Mirth via MirthDispatcher. Replaces OfflineQueue JSON files with unified stage_queue persistence."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-014"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T01:25:00+07:00"
+    deadline: "2026-04-07"
+    acceptance_criteria:
+      - "âœ… DispatchWorker claims stage='dispatch' items"
+      - "âœ… Sends to Mirth via MirthDispatcher.dispatch_raw()"
+      - "âœ… Failed dispatches use typed retry (auto-backoff)"
+      - "âœ… Dead letter for permanently failed messages (4xx)"
+      - "âœ… 129/129 tests pass"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/workflow/dispatch_worker.py"
+      - "packages/lab-connector/tests/test_dispatch_worker.py"
+    notes: "OfflineQueue is deprecated in favor of StageQueue persistence."
+  - id: "TASK-018"
+    title: "Build PipelineRuntime (lifecycle + shutdown/recovery)"
+    description: "Implement PipelineRuntime that orchestrates all stage workers. Includes graceful shutdown (drainâ†’finishâ†’flushâ†’persistâ†’exit per ADR-0003 Â§3), crash recovery on startup (recover expired leases per Â§3b), and per-connector/per-stage pause/resume."
+    assigned_role: "backend-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-016", "TASK-017"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T02:15:00+07:00"
+    deadline: "2026-04-09"
+    acceptance_criteria:
+      - "âœ… PipelineRuntime starts all workers (Parse, Map, Dispatch)"
+      - "âœ… Graceful shutdown loop implemented"
+      - "âœ… Startup recovery: recover_expired_leases() on boot"
+      - "âœ… Periodic lease recovery loop (every 60s)"
+      - "âœ… Circular import issues resolved via lazy local imports"
+      - "âœ… 132/132 tests pass"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/core/pipeline_runtime.py"
+      - "packages/lab-connector/tests/test_pipeline_runtime.py"
+    notes: "Uses TYPE_CHECKING + annotations to break dependency loops."
+
+  - id: "TASK-019"
+    title: "Build InputAdapter ABC + FolderWatchAdapter"
+    description: "Create InputAdapter abstraction (ADR-0002) for non-stream sources. Implement FolderWatchAdapter that watches a directory for new files, detects stable files (no partial writes), and enqueues them into stage_queue at stage='parse'."
+    assigned_role: "backend-agent"
+    priority: "medium"
+    status: "done"
+    dependencies: ["TASK-015"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T02:25:00+07:00"
+    deadline: "2026-04-11"
+    acceptance_criteria:
+      - "âœ… InputAdapter ABC defined"
+      - "âœ… FolderWatchAdapter with size-stability logic implemented"
+      - "âœ… Fixed system-wide 7-hour timezone bug (Golden Rule)"
+      - "âœ… Automated archive/error file movement"
+      - "âœ… Enqueues to 'parse' stage verified"
+      - "âœ… 136/136 tests pass"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/ingress/base_adapter.py"
+      - "packages/lab-connector/src/lab_connector/ingress/folder_watch.py"
+      - "packages/lab-connector/tests/test_folder_watch.py"
+    notes: "Prepares for Beckman/Sysmex file-drop analyzers. Timezone bug fixed in storage layer as well."
+
+  - id: "TASK-020"
+    title: "Dashboard: pipeline health view"
+    description: "Add /api/pipeline endpoint to dashboard showing stage_queue health. Display per-stage item counts (pending/claimed/done/error/dead) and queue depth alerts."
+    assigned_role: "fullstack-agent"
+    priority: "medium"
+    status: "done"
+    dependencies: ["TASK-014"]
+    created_at: "2026-03-31T00:05:00+07:00"
+    completed_at: "2026-03-31T03:02:00+07:00"
+    deadline: "2026-04-13"
+    acceptance_criteria:
+      - "âœ… /api/pipeline returns stage/status counts"
+      - "âœ… Dashboard UI shows pipeline health panel"
+      - "âœ… Queue depth > 100 shows alert indicator"
+      - "âœ… Responsive HTML works on any browser"
+      - "âœ… Unit tests updated in tests/test_dashboard.py"
+    output_files: ["packages/lab-connector/src/lab_connector/dashboard/server.py", "packages/lab-connector/src/lab_connector/dashboard/static/index.html", "packages/lab-connector/src/lab_connector/dashboard/static/app.js", "packages/lab-connector/tests/test_dashboard.py", "packages/lab-connector/src/lab_connector/dashboard/static/style.css"]
+    notes: "SELECT stage, status, COUNT(*) FROM stage_queue GROUP BY 1,2"
+
+  # â”€â”€ Sprint 3: Production Hardening & Operator Tooling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  - id: "TASK-021"
+    title: "Fix archive filename format (collision avoidance)"
+    description: "BUG: FolderWatchAdapter collision-avoidance filename used '%Y%H%M%S' (wrong â€” %H=hour, missing month). Must use '%Y%m%d_%H%M%S' for ISO-safe sortable filenames."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-019"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T09:35:00+07:00"
+    acceptance_criteria:
+      - "âœ… strftime format corrected to '%Y%m%d_%H%M%S'"
+      - "âœ… Regression test added (test_archive_filename_collision_format)"
+      - "âœ… 141/141 tests pass"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/ingress/folder_watch.py"
+      - "packages/lab-connector/tests/test_folder_watch.py"
+
+  - id: "TASK-022"
+    title: "E2E pipeline integration test"
+    description: "Write end-to-end integration test that exercises the full Parseâ†’Mapâ†’Dispatch flow using real StageQueue (in-memory SQLite). Covers happy path, error propagation, and lease expiry."
+    assigned_role: "qa-lead-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-018"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T12:00:00+07:00"
+    deadline: "2026-04-05"
+
+  - id: "TASK-023"
+    title: "`labctl` CLI for queue operations"
+    description: "Build a minimal CLI tool `labctl` for DevOps/Ops to inspect and manage the StageQueue: list items by stage/status, retry dead items, drain a stage."
+    assigned_role: "tools-programmer-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-014"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T12:05:00+07:00"
+    deadline: "2026-04-07"
+
+  - id: "TASK-024"
+    title: "System entry point `__main__.py`"
+    description: "Create `lab_connector/__main__.py` that boots PipelineRuntime + registers SIGTERM/SIGINT handlers for graceful shutdown."
+    assigned_role: "fullstack-agent"
+    priority: "P2"
+    status: "done"
+    dependencies: ["TASK-018"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T10:45:00+07:00"
+    deadline: "2026-04-09"
+    output_files: ["packages/lab-connector/src/lab_connector/__main__.py"]
+
+  - id: "TASK-025"
+    title: "Pipeline throughput metrics"
+    description: "Add PipelineMetrics dataclass to PipelineRuntime with uptime_seconds, leases_recovered_total, workers_running. Expose via runtime.metrics() and /api/metrics HTTP endpoint."
+    assigned_role: "backend-agent"
+    priority: "P2"
+    status: "done"
+    dependencies: ["TASK-018"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T09:35:00+07:00"
+    acceptance_criteria:
+      - "âœ… PipelineMetrics dataclass implemented"
+      - "âœ… metrics() method exposed on PipelineRuntime"
+      - "âœ… PipelineMetrics exported from core/__init__.py"
+      - "âœ… 3 tests in test_metrics.py"
+      - "âœ… 141/141 tests pass"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/core/pipeline_runtime.py"
+      - "packages/lab-connector/tests/test_metrics.py"
+
+  - id: "TASK-026"
+    title: "Config schema validator"
+    description: "Add JSON Schema validation for analyzer YAML configs using jsonschema. Raise clear errors on missing required fields."
+    assigned_role: "tools-programmer-agent"
+    priority: "P2"
+    status: "done"
+    dependencies: ["TASK-015"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T12:10:00+07:00"
+    deadline: "2026-04-11"
+
+  - id: "TASK-027"
+    title: "Dashboard dead-letter management"
+    description: "Add /api/deadletter endpoint and UI panel to list, inspect, and re-queue items in status='dead'."
+    assigned_role: "fullstack-agent"
+    priority: "P2"
+    status: "done"
+    dependencies: ["TASK-020"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T12:15:00+07:00"
+    deadline: "2026-04-13"
+
+  - id: "TASK-028"
+    title: "ADR-0003 validation checklist"
+    description: "Walk through adr-0003-stage-queue-pipeline.md and verify that every design decision is implemented, tested, and documented."
+    assigned_role: "qa-lead-agent"
+    priority: "P2"
+    status: "done"
+    dependencies: ["TASK-022"]
+    created_at: "2026-03-31T09:21:00+07:00"
+    completed_at: "2026-03-31T12:35:00+07:00"
+    deadline: "2026-04-15"
+    output_files: ["MyTeam/.hub/done/TASK-028.md"]
+
+  - id: "TASK-029"
+    title: "BUG: Implement missing pause_stage and resume_stage"
+    description: "ADR-0003 validation found PipelineRuntime lacks per-stage pause/resume methods (pause_stage, resume_stage) as specified in the ADR."
+    assigned_role: "backend-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: []
+    created_at: "2026-03-31T12:35:00+07:00"
+    completed_at: "2026-03-31T12:45:00+07:00"
+    deadline: "2026-04-06"
+    output_files: ["MyTeam/.hub/done/TASK-029.md"]
+
+  # â”€â”€ Sprint 4: Canonical Core & Operations Console â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  - id: "TASK-030"
+    title: "Canonical Pydantic models (6 types)"
+    description: "Implement unified Pydantic models for raw, parsed, mapped, and result items to ensure type safety across all stages (ADR-0004)."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-021"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T14:10:00+07:00"
+    deadline: "2026-04-18"
+    acceptance_criteria:
+      - "âœ… 6 canonical Pydantic models defined (ADR-0004)"
+      - "âœ… Exported from lab_connector.core"
+      - "âœ… 6 unit tests pass"
+    output_files: ["packages/lab-connector/src/lab_connector/core/models.py"]
+
+  - id: "TASK-031"
+    title: "`trace_id` generation + propagation"
+    description: "Ensure every transaction has a unique trace_id from ingress that persists through all stage_queue transitions for E2E visibility."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-030"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T14:35:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… trace_id column added to SQLite"
+      - "âœ… Format 'trc-{uuid}' generated at Ingress"
+      - "âœ… trace_id propagates via complete()"
+      - "âœ… 178/178 tests pass (100% aware UTC)"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/storage/stage_queue.py"
+      - "packages/lab-connector/src/lab_connector/ingress/folder_watch.py"
+      - "packages/lab-connector/tests/test_trace_id.py"
+
+  - id: "TASK-032"
+    title: "Locked enums (Stage, Status, Action)"
+    description: "Refactor string constants to strict Enums for stages, item statuses, and operator actions."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-030"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T14:10:00+07:00"
+    deadline: "2026-04-22"
+    acceptance_criteria:
+      - "âœ… Stage, StageStatus, OperatorAction Enums implemented"
+      - "âœ… Validation verified in unit tests"
+    output_files: ["packages/lab-connector/src/lab_connector/core/models.py"]
+
+  - id: "TASK-033"
+    title: "SQLite mapping schema"
+    description: "Implement device_profile, mapping_rule, and mapping_version tables in SQLite for dynamic configuration management."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-030"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T15:00:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… MappingStore implemented with aiosqlite"
+      - "âœ… device_profiles, mapping_rules, versions, audit tables verified"
+      - "âœ… mapping_versions snapshotting verified via unit tests"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/storage/mapping_store.py"
+      - "packages/lab-connector/tests/test_mapping_store.py"
+
+  - id: "TASK-034"
+    title: "Mapping CRUD service + versioning"
+    description: "Build business logic for rule updates, snapshot promotion and rollback."
+    assigned_role: "backend-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-033"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T15:00:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… MappingService wraps store and provides mapping execution logic"
+      - "âœ… Import/Export/Audit methods implemented"
+      - "âœ… 100% test coverage for service logic"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/mapping/mapping_service.py"
+      - "packages/lab-connector/tests/test_mapping_service.py"
+
+  - id: "TASK-035"
+    title: "Migrate CA270 YAML mapping â†’ SQLite"
+    description: "Bulk import existing test code maps into the new SQLite profile."
+    assigned_role: "backend-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-034"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T15:00:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… 19 mapping rules for CA270 successfully migrated"
+      - "âœ… Migration verification script functional"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/mapping/seed_ca270.py"
+      - "packages/lab-connector/storage/mapping.db"
+
+  - id: "TASK-036"
+    title: "Mapping audit trail (change_log)"
+    description: "Capture all rule changes in the audit table for regulatory compliance."
+    assigned_role: "qa-lead-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-033"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T15:00:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… All changes to rules logged with operator and timestamp"
+      - "âœ… Audit trail queryable via MappingService"
+
+
+  - id: "TASK-040"
+    title: "Transactions tab UI"
+    description: "Build Operations Console tab for searching and viewing transaction timelines and details."
+    assigned_role: "ui-programmer-agent"
+    priority: "P0"
+    status: "claimed"
+    dependencies: ["TASK-037"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    deadline: "2026-05-15"
+
+  - id: "TASK-041"
+    title: "Errors tab UI"
+    description: "Build Operations Console tab for filtering errors and triggering retry/replay actions."
+    assigned_role: "ui-programmer-agent"
+    priority: "P1"
+    status: "blocked"
+    dependencies: ["TASK-040", "TASK-038"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    deadline: "2026-05-18"
+
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  # SPRINT 4C â€” Trace & Replay API
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+  - id: "TASK-037"
+    title: "Transaction timeline API"
+    description: "Add /api/transactions/search and /api/transactions/{trace_id}/timeline endpoints to dashboard. Query raw_inbound + stage_queue joined by trace_id. Return list of TransactionTimelineEntry from models.py."
+    assigned_role: "fullstack-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: ["TASK-031"]
+    created_at: "2026-03-31T20:34:00+07:00"
+    completed_at: "2026-03-31T20:38:00+07:00"
+    deadline: "2026-04-15"
+    acceptance_criteria:
+      - "GET /api/transactions/search?analyzer_id=&status=&limit=50 returns list of transactions"
+      - "GET /api/transactions/{trace_id}/timeline returns ordered stage history"
+      - "Unit tests in test_dashboard.py"
+    output_files: []
+    notes: "Uses existing trace_id propagation from TASK-031. Query raw_inbound + stage_queue."
+
+  - id: "TASK-038"
+    title: "Replay from raw API"
+    description: "Add POST /api/replay endpoint. Looks up raw_inbound_id via trace_id from stage_queue, then calls raw_store.enqueue_replay(). Returns replay_id."
+    assigned_role: "fullstack-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: ["TASK-037"]
+    created_at: "2026-03-31T20:34:00+07:00"
+    completed_at: "2026-03-31T20:38:00+07:00"
+    deadline: "2026-04-16"
+    acceptance_criteria:
+      - "POST /api/replay with {trace_id} queues a replay item"
+      - "Returns {ok: true, replay_id: str}"
+      - "Unit tests added"
+    output_files: []
+    notes: "Calls raw_store.enqueue_replay(). Existing replay_queue table used."
+
+  - id: "TASK-039"
+    title: "Resend dispatch API"
+    description: "Add POST /api/resend endpoint. Re-enqueues a trace into stage=dispatch in stage_queue for re-delivery to Mirth."
+    assigned_role: "fullstack-agent"
+    priority: "high"
+    status: "done"
+    dependencies: ["TASK-038"]
+    created_at: "2026-03-31T20:34:00+07:00"
+    completed_at: "2026-03-31T20:38:00+07:00"
+    deadline: "2026-04-17"
+    acceptance_criteria:
+      - "POST /api/resend with {trace_id} re-enqueues at stage=dispatch"
+      - "Returns {ok: true, queue_id: str}"
+      - "Unit tests added"
+    output_files: []
+    notes: "Re-enqueue into stage_queue at stage='dispatch'."
+
+  - id: "TASK-040"
+    title: "Transactions tab UI"
+    description: "Build Operations Console tab for searching and viewing transaction timelines and details."
+    assigned_role: "ui-programmer-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-037"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T20:58:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… Tab navigation system (Overview, Transactions, Dead Letter, Messages)"
+      - "âœ… Transaction search with analyzer_id + status filters"
+      - "âœ… Results table with ID, Analyzer, Status, Received, Bytes, Actions"
+      - "âœ… Transaction detail modal with stage journey timeline"
+      - "âœ… Replay from Raw + Resend to Mirth action buttons"
+      - "âœ… XSS-safe rendering (escapeHtml on all user data)"
+      - "âœ… Toast notifications for action feedback"
+      - "âœ… ARIA roles for accessibility"
+      - "âœ… 9/9 existing tests pass (0 regressions)"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/dashboard/static/index.html"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/app.js"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/style.css"
+
+  - id: "TASK-041"
+    title: "Errors tab UI"
+    description: "Build Operations Console tab for filtering errors and triggering retry/replay actions."
+    assigned_role: "ui-programmer-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-040", "TASK-038"]
+    created_at: "2026-03-31T12:46:00+07:00"
+    completed_at: "2026-03-31T21:12:00+07:00"
+    deadline: "2026-04-22"
+    acceptance_criteria:
+      - "âœ… Errors tab with stage + device filters"
+      - "âœ… Error summary grid (per-stage error+dead counts)"
+      - "âœ… Error items table with ID, Connector, Stage, Status, Error, Attempts, Actions"
+      - "âœ… Inspect modal reuse (dead letter detail)"
+      - "âœ… Bulk retry by stage + error_class"
+      - "âœ… GET /api/errors endpoint with filters"
+      - "âœ… POST /api/errors/retry endpoint for bulk requeue"
+      - "âœ… XSS-safe rendering"
+      - "âœ… 9/9 existing tests pass (0 regressions)"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/dashboard/server.py"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/index.html"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/app.js"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/style.css"
+
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  # SPRINT 5 â€” Bidirectional Order Management & Query Mode
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+  - id: "TASK-042"
+    title: "ADR-0005: Bidirectional Order Management architecture"
+    description: "Write ADR-0005 decision record covering OrderCache schema, QueryWorker state machine, Exception/Suspense Queue, flag/unit mapping enhancement, and Order intake API design."
+    assigned_role: "cto-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: []
+    created_at: "2026-04-01T00:20:00+07:00"
+    completed_at: "2026-04-01T00:23:00+07:00"
+    deadline: "2026-04-01"
+    acceptance_criteria:
+      - "âœ… ADR-0005 covers OrderCache, QueryWorker, Exception Queue, Flag/Unit mapping"
+      - "âœ… SQL schema for order_cache and query_session tables"
+      - "âœ… State machine diagram for Query workflow"
+      - "âœ… New Stage enum values (QUERY, ORDER_SEND)"
+      - "âœ… Saved to docs/architecture/adr-0005-bidirectional-order-query.md"
+    output_files: ["packages/lab-connector/docs/architecture/adr-0005-bidirectional-order-query.md"]
+
+  - id: "TASK-043"
+    title: "Device Registry enhancement (capability profile for bidirectional)"
+    description: "Extend device_profiles table and ConnectorCapabilities to include bidirectional support flags: supports_query_mode, supports_order_push, supports_cancel, default_query_timeout_ms."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-042"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T00:50:00+07:00"
+    deadline: "2026-04-07"
+    acceptance_criteria:
+      - "âœ… device_profiles table extended with bidirectional capability columns"
+      - "âœ… ConnectorCapabilities dataclass updated"
+      - "âœ… CA270 profile updated with query_mode=true"
+      - "âœ… Unit tests pass"
+    output_files: 
+      - "packages/lab-connector/src/lab_connector/storage/mapping_store.py"
+      - "packages/lab-connector/src/lab_connector/core/capabilities.py"
+      - "packages/lab-connector/plugins/ca270/plugin.py"
+      - "packages/lab-connector/tests/test_mapping_store.py"
+      - "packages/lab-connector/tests/test_capabilities.py"
+
+  - id: "TASK-044"
+    title: "OrderCache SQLite schema + Service layer"
+    description: "Create order_cache and query_session tables per ADR-0005. Build OrderCacheService with methods: add_order(), lookup_by_specimen(), mark_dispatched(), expire_stale(), get_pending_count()."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-043"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T01:30:00+07:00"
+    deadline: "2026-04-10"
+    acceptance_criteria:
+      - "âœ… order_cache table created with TTL, status, device_id"
+      - "âœ… query_session table created with latency tracking"
+      - "âœ… OrderCacheService CRUD + TTL expiry implemented"
+      - "âœ… Idempotent lookup (same specimen â†’ same order)"
+      - "âœ… Unit tests with in-memory SQLite"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/storage/order_store.py"
+      - "packages/lab-connector/src/lab_connector/storage/order_service.py"
+      - "packages/lab-connector/tests/test_order_cache.py"
+
+  - id: "TASK-045"
+    title: "QueryWorker (analyzer query â†’ order response)"
+    description: "Build QueryWorker as StageWorker subclass for stage='query'. Handles incoming analyzer queries, looks up OrderCache, builds ASTM O-record response, logs query_session. Implements Cache-Miss fallback stub."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-044"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T07:55:00+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "âœ… QueryWorker claims stage='query' items"
+      - "âœ… Cache HIT â†’ responds with Order within 500ms"
+      - "âœ… Cache MISS â†’ logs 'no_order' response"
+      - "âœ… query_session logged for every query"
+      - "âœ… Unit tests for hit/miss/timeout scenarios"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/workflow/query_worker.py"
+      - "packages/lab-connector/src/lab_connector/storage/stage_queue.py"
+      - "packages/lab-connector/tests/test_query_worker.py"
+
+  - id: "TASK-046"
+    title: "ASTM Order record builder (outbound O/Q record codec)"
+    description: "Extend ASTM codec to BUILD outbound Order records (O record) and Query responses. Currently codec only parses inbound; this adds serialization for sending orders/responses back to analyzer."
+    assigned_role: "backend-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-045"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T08:05:00+07:00"
+    deadline: "2026-04-16"
+    acceptance_criteria:
+      - "âœ… ASTM codec can build O-record frames with checksum"
+      - "âœ… Frame sequence number management for outbound"
+      - "âœ… Unit tests with known-good O record samples"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/protocol/astm_order_builder.py"
+      - "packages/lab-connector/tests/test_astm_order_builder.py"
+
+  - id: "TASK-047"
+    title: "Exception/Suspense Queue for orphan results"
+    description: "When ParseWorker or MapWorker encounters result with no matching order, set stage_queue status='suspended' instead of 'failed'. Add StageStatus.SUSPENDED enum value."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-044"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T08:00:00+07:00"
+    deadline: "2026-04-12"
+    acceptance_criteria:
+      - "âœ… StageStatus.SUSPENDED enum added to models.py"
+      - "âœ… ParseWorker sets status=suspended when order_id is None and device supports query mode"
+      - "âœ… Suspended items queryable via existing /api/errors or new /api/exceptions endpoint"
+      - "âœ… Unit tests for suspension and manual resolution flow"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/storage/exception_store.py"
+      - "packages/lab-connector/src/lab_connector/storage/exception_service.py"
+      - "packages/lab-connector/src/lab_connector/storage/stage_queue.py"
+      - "packages/lab-connector/tests/test_exception_queue.py"
+
+  - id: "TASK-048"
+    title: "Mapping enhancement: flag + unit normalization in MapWorker"
+    description: "Extend MapWorker to apply rule_type='flag' and rule_type='unit' from mapping_rules. Normalize abnormal flags (e.g. '*H' â†’ 'H') and units (e.g. 'mg/dl' â†’ 'mg/dL') before dispatch."
+    assigned_role: "backend-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-043"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T08:10:00+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "âœ… MapWorker reads flag/unit rules from MappingStore"
+      - "âœ… ResultComponent.flag and .unit normalized per rules"
+      - "âœ… Unmapped flags/units pass through unchanged (no data loss)"
+      - "âœ… Unit tests with CA270 flag samples"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/mapping/mapping_service.py"
+      - "packages/lab-connector/tests/test_flag_unit_mapping.py"
+      - "MapWorker reads flag/unit rules from MappingStore"
+      - "ResultComponent.flag and .unit normalized per rules"
+      - "Unmapped flags/units pass through unchanged (no data loss)"
+      - "Unit tests with CA270 flag samples"
+
+  - id: "TASK-049"
+    title: "Order intake API: POST /api/orders (Mirth â†’ Gateway)"
+    description: "Add POST /api/orders endpoint to dashboard server. Accepts order payload from Mirth webhook, validates, inserts into OrderCache. Returns order_cache_id and expires_at."
+    assigned_role: "fullstack-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-044"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T08:45:00+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "âœ… POST /api/orders accepts JSON with specimen_id, tests, device_id, ttl"
+      - "âœ… Returns 201 with order_cache_id"
+      - "âœ… Duplicate specimen_id â†’ returns existing active order (idempotent)"
+      - "âœ… Unit tests in test_dashboard.py (4 new tests)"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/dashboard/server.py"
+      - "packages/lab-connector/tests/test_dashboard.py"
+
+  - id: "TASK-050"
+    title: "Dashboard: Worklist tab (pending orders view)"
+    description: "Add Worklist tab to Operations Console showing all active orders in OrderCache. Filter by device, status, priority. Show count badges. Auto-refresh."
+    assigned_role: "ui-programmer-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-049"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T10:15:00+07:00"
+    deadline: "2026-04-18"
+    acceptance_criteria:
+      - "âœ… New Worklist tab in dashboard"
+      - "âœ… Table: Specimen, Patient, Device, Tests, Priority, Expires, Status"
+      - "âœ… Filters: device_id, status, priority"
+      - "âœ… Count badge on tab header"
+      - "âœ… Auto-refresh every 10s"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/storage/order_store.py"
+      - "packages/lab-connector/src/lab_connector/dashboard/server.py"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/index.html"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/app.js"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/style.css"
+      - "packages/lab-connector/tests/test_dashboard.py"
+
+  - id: "TASK-051"
+    title: "Dashboard: Exception Queue UI (orphan result resolution)"
+    description: "Add Exception Queue section (within Errors tab or new tab) showing suspended items. Operator can: Map to existing order, Create manual order, or Reject with reason."
+    assigned_role: "ui-programmer-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-047", "TASK-050"]
+    created_at: "2026-04-01T00:23:00+07:00"
+    completed_at: "2026-04-01T10:30:00+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "âœ… Suspended items visible in UI with specimen_id, raw data preview"
+      - "âœ… Map to Order button â†’ links trace_id to existing order_cache entry"
+      - "âœ… Reject button â†’ moves to dead_letter with reason"
+      - "âœ… Resolved items disappear from exception queue"
+    output_files:
+      - "packages/lab-connector/src/lab_connector/dashboard/server.py"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/index.html"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/app.js"
+      - "packages/lab-connector/src/lab_connector/dashboard/static/style.css"
+      - "packages/lab-connector/tests/test_dashboard.py"
+
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  # SPRINT 6 â€” End-to-End Thin Slice (LIS Core Foundation)
+  # Spec: packages/lis-core/docs/sprint6-spec-v1.md (FROZEN)
+  # ADR:  packages/lis-core/docs/architecture/adr-0006-lis-core-thin-slice.md
+  # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+  - id: "TASK-052"
+    title: "ADR-0006 + Frozen Spec v1.0 for Sprint 6"
+    description: "Write ADR-0006 (LIS Core Thin Slice) and save CTO-approved Sprint 6 Spec v1.0 with frozen contracts, order lifecycle, resolver fallback policy, and exit criteria."
+    assigned_role: "cto-agent"
+    priority: "critical"
+    status: "done"
+    dependencies: []
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T11:54:00+07:00"
+    deadline: "2026-04-01"
+    acceptance_criteria:
+      - "âœ… ADR-0006 covers all 11 primary decisions"
+      - "âœ… Spec v1.0 has 3 frozen JSON contracts (Order, ACK, Result)"
+      - "âœ… Order lifecycle state machine defined (6 states)"
+      - "âœ… Resolver fallback policy (4 paths)"
+      - "âœ… Exit criteria: 4 happy + 4 negative"
+    output_files:
+      - "packages/lis-core/docs/sprint6-spec-v1.md"
+      - "packages/lis-core/docs/architecture/adr-0006-lis-core-thin-slice.md"
+
+  - id: "TASK-053"
+    title: "Freeze Pydantic contract schemas (Order, ACK, Result)"
+    description: "Code the 3 frozen Pydantic schemas from Spec v1.0 Â§2: OutboundOrderEvent, GatewayACK, InboundResultEvent. Include envelope fields (message_id, trace_id, version, occurred_at, idempotency_key). These are shared contracts used by both LIS Core and Gateway."
+    assigned_role: "cto-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-052"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T12:26:53.8655464+07:00"
+    deadline: "2026-04-03"
+    acceptance_criteria:
+      - "3 Pydantic models matching Spec Â§2.1, Â§2.2, Â§2.3 exactly"
+      - "Shared module importable by both lis-core and lab-connector"
+      - "Unit tests validate serialization/deserialization"
+    output_files:
+      - "packages/shared/pyproject.toml"
+      - "packages/shared/src/lab_shared/__init__.py"
+      - "packages/shared/src/lab_shared/schemas/__init__.py"
+      - "packages/shared/src/lab_shared/schemas/contracts.py"
+      - "packages/shared/tests/conftest.py"
+      - "packages/shared/tests/test_contracts.py"
+      - "packages/lab-connector/tests/conftest.py"
+      - "packages/lab-connector/tests/test_shared_contract_imports.py"
+
+  - id: "TASK-054"
+    title: "Setup LIS Core project (FastAPI + PostgreSQL + Alembic)"
+    description: "Bootstrap packages/lis-core: FastAPI app, SQLAlchemy engine, Alembic migrations, PostgreSQL connection, project structure, dev server, and basic health endpoint."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-053"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T13:33:34.7059837+07:00"
+    deadline: "2026-04-05"
+    acceptance_criteria:
+      - "FastAPI app starts and serves GET /health"
+      - "Alembic init with first empty migration"
+      - "PostgreSQL connection verified"
+      - "Project structure: routers/, models/, services/, schemas/"
+    output_files:
+      - "packages/lis-core/pyproject.toml"
+      - "packages/lis-core/alembic.ini"
+      - "packages/lis-core/alembic/"
+      - "packages/lis-core/src/lis_core/"
+      - "packages/lis-core/tests/"
+      - "MyTeam/.hub/done/TASK-054.md"
+
+  - id: "TASK-055"
+    title: "Master Data: TestCatalog + ReferenceRangeRule schema & seeder"
+    description: "Create SQLAlchemy models for TestCatalog (code, name, canonical_unit) and ReferenceRangeRule (test_code, sex, age_min, age_max, value_min, value_max). Write seed script that imports from YAML/CSV file."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-054"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T15:04:28.5031921+07:00"
+    deadline: "2026-04-07"
+    acceptance_criteria:
+      - "TestCatalog and ReferenceRangeRule tables created via Alembic"
+      - "Seed script loads sample data (GLU, AST, ALT, etc.)"
+      - "Read-only API: GET /api/meta/tests, GET /api/meta/reference-ranges"
+      - "Unit tests for seeder and meta endpoints"
+    output_files:
+      - "packages/lis-core/alembic/versions/20260401_02_master_data_catalog.py"
+      - "packages/lis-core/data/master_data/"
+      - "packages/lis-core/src/lis_core/cli/"
+      - "packages/lis-core/src/lis_core/models/"
+      - "packages/lis-core/src/lis_core/routers/meta.py"
+      - "packages/lis-core/src/lis_core/schemas/master_data.py"
+      - "packages/lis-core/src/lis_core/services/master_data_seed.py"
+      - "packages/lis-core/src/lis_core/services/meta.py"
+      - "packages/lis-core/tests/test_master_data_seed.py"
+      - "packages/lis-core/tests/test_meta.py"
+      - "MyTeam/.hub/done/TASK-055.md"
+
+  - id: "TASK-056"
+    title: "Order & Specimen schema + Order Entry API"
+    description: "Create Order model with patient snapshot (name, sex, age), specimen_id (barcode), device_id, status (Spec Â§3 lifecycle), and accession number generation. Build POST /api/orders for order creation."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-055"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T15:17:53.5018137+07:00"
+    deadline: "2026-04-09"
+    acceptance_criteria:
+      - "Order table with status enum matching Spec Â§3"
+      - "POST /api/orders creates order, generates barcode, status=created"
+      - "Order transitions to queued_for_gateway after Mirth push triggered"
+      - "Unit tests for creation and state transitions"
+    output_files:
+      - "packages/lis-core/alembic/versions/20260401_03_order_entry.py"
+      - "packages/lis-core/src/lis_core/models/order.py"
+      - "packages/lis-core/src/lis_core/routers/orders.py"
+      - "packages/lis-core/src/lis_core/schemas/order.py"
+      - "packages/lis-core/src/lis_core/services/orders.py"
+      - "packages/lis-core/tests/test_orders.py"
+      - "MyTeam/.hub/done/TASK-056.md"
+
+  - id: "TASK-057"
+    title: "Setup Mirth Channels (3 zero-logic channels)"
+    description: "Configure 3 Mirth channels: Ch1 LISâ†’Gateway /api/orders (order sync), Ch2 Gatewayâ†’LIS /api/integration/orders/ack (ACK callback), Ch3 Gatewayâ†’LIS /api/integration/results/inbound (result sync). All pass-through with retry and logging only."
+    assigned_role: "fullstack-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-053"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T19:35:00+07:00"
+    deadline: "2026-04-07"
+    acceptance_criteria:
+      - "Channel 1: forwards OutboundOrderEvent to Gateway"
+      - "Channel 2: relays GatewayACK back to LIS"
+      - "Channel 3: forwards InboundResultEvent to LIS"
+      - "Retry on failure with configurable backoff"
+      - "Integration test with mock endpoints"
+    output_files:
+      - "packages/lab-connector/config/mirth/task_057_channels.yaml"
+      - "packages/lab-connector/config/mirth/channels/01-lis-orders-to-gateway.xml"
+      - "packages/lab-connector/config/mirth/channels/02-gateway-ack-to-lis.xml"
+      - "packages/lab-connector/config/mirth/channels/03-gateway-results-to-lis.xml"
+      - "packages/lab-connector/docs/integration/mirth-channels.md"
+      - "packages/lab-connector/src/lab_connector/mirth/__init__.py"
+      - "packages/lab-connector/src/lab_connector/mirth/channel_exports.py"
+      - "packages/lab-connector/tests/test_mirth_channel_exports.py"
+
+  - id: "TASK-058"
+    title: "LIS Integration API: ACK handler + order state update"
+    description: "Build POST /api/integration/orders/ack endpoint. On receiving GatewayACK with sync_status=accepted_new|accepted_existing, update order status to synced_to_gateway. On rejected, set sync_failed."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-056", "TASK-057"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T17:09:36+07:00"
+    deadline: "2026-04-10"
+    acceptance_criteria:
+      - "ACK endpoint validates GatewayACK schema"
+      - "Order state transitions correctly on accepted/rejected"
+      - "Idempotent: duplicate ACK does not error"
+      - "Audit log entry created"
+      - "Unit tests for all sync_status values"
+    output_files:
+      - "packages/lis-core/alembic/versions/20260401_04_gateway_ack_audit.py"
+      - "packages/lis-core/src/lis_core/models/order_sync_audit.py"
+      - "packages/lis-core/src/lis_core/routers/integration_orders.py"
+      - "packages/lis-core/src/lis_core/schemas/integration.py"
+      - "packages/lis-core/src/lis_core/services/orders.py"
+      - "packages/lis-core/tests/test_order_ack.py"
+      - "MyTeam/.hub/done/TASK-058.md"
+
+  - id: "TASK-059"
+    title: "LIS Integration API: Inbound Result + Resolver Engine"
+    description: "Build POST /api/integration/results/inbound. Validate InboundResultEvent, apply idempotency (Spec Â§2.4), create Result records, run Resolver against TestCatalog+ReferenceRange to set auto_flag. Implement all 4 fallback paths (Spec Â§5)."
+    assigned_role: "backend-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-055", "TASK-058"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T17:51:48+07:00"
+    deadline: "2026-04-12"
+    acceptance_criteria:
+      - "Inbound result creates InboxResult record linked to Order"
+      - "Order status transitions to result_received"
+      - "Resolver gáº¯n auto_flag=N/H/L on happy path"
+      - "Fallback: range_unresolved, unit_mismatch, unknown_test"
+      - "Duplicate idempotency_key â†’ skip, no new record"
+      - "Corrected result_kind â†’ new version, old preserved"
+      - "Rerun â†’ pending candidate, Ã©p manual review"
+      - "Unit tests for all 4 resolver paths + 3 result policies"
+    output_files:
+      - "packages/lis-core/alembic/versions/20260401_05_inbox_results.py"
+      - "packages/lis-core/src/lis_core/models/inbox_result.py"
+      - "packages/lis-core/src/lis_core/models/inbox_result_component.py"
+      - "packages/lis-core/src/lis_core/routers/integration_results.py"
+      - "packages/lis-core/src/lis_core/schemas/result.py"
+      - "packages/lis-core/src/lis_core/services/results.py"
+      - "packages/lis-core/tests/test_inbound_results.py"
+
+  - id: "TASK-060"
+    title: "Result Approval workflow + PDF report generation"
+    description: "Build approve endpoint (POST /api/results/{id}/approve). On approve: order status â†’ approved, audit log created. Build PDF/HTML report template with patient snapshot, test results, flags, and approval timestamp."
+    assigned_role: "backend-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-059"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T22:22:15+07:00"
+    deadline: "2026-04-14"
+    acceptance_criteria:
+      - "Approve endpoint transitions order to approved"
+      - "PDF generated with patient, tests, values, flags, approval info"
+      - "GET /api/results/{id}/report returns PDF download"
+      - "Audit log for approval action"
+    output_files:
+      - "packages/lis-core/alembic/versions/20260401_06_result_approval.py"
+      - "packages/lis-core/src/lis_core/models/result_approval_audit.py"
+      - "packages/lis-core/src/lis_core/routers/results.py"
+      - "packages/lis-core/src/lis_core/schemas/result.py"
+      - "packages/lis-core/src/lis_core/services/result_approval.py"
+      - "packages/lis-core/tests/test_result_approval.py"
+
+  - id: "TASK-061"
+    title: "Minimal LIS Web App (Vanilla JS: 3 tabs)"
+    description: "Build Vanilla JS + static HTML frontend served by FastAPI. 3 tabs: Order Entry (create order + show barcode), Result Inbox (pending list with H/L flag colors, approve button), Debug/Meta (read-only TestCatalog and ReferenceRange view). Auth via backend session, no hardcoded tokens in JS."
+    assigned_role: "ui-programmer-agent"
+    priority: "P1"
+    status: "done"
+    dependencies: ["TASK-060"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T23:13:31.6128055+07:00"
+    deadline: "2026-04-18"
+    acceptance_criteria:
+      - "Order Entry tab: form + barcode display"
+      - "Result Inbox tab: list with color-coded flags, approve button, PDF link"
+      - "Debug tab: read-only TestCatalog and ReferenceRange tables"
+      - "No hardcoded auth tokens in JS"
+    output_files:
+      - "packages/lis-core/src/lis_core/app.py"
+      - "packages/lis-core/src/lis_core/routers/results.py"
+      - "packages/lis-core/src/lis_core/schemas/__init__.py"
+      - "packages/lis-core/src/lis_core/schemas/result.py"
+      - "packages/lis-core/src/lis_core/services/result_approval.py"
+      - "packages/lis-core/src/lis_core/static/index.html"
+      - "packages/lis-core/src/lis_core/static/style.css"
+      - "packages/lis-core/src/lis_core/static/app.js"
+      - "packages/lis-core/tests/test_web_ui.py"
+      - "MyTeam/.hub/done/TASK-061.md"
+
+  - id: "TASK-062"
+    title: "QA: Happy Path E2E (Order â†’ Gateway â†’ Result â†’ Approve â†’ PDF)"
+    description: "Full E2E test: Create order on LIS UI â†’ Mirth routes to Gateway â†’ Simulator queries order â†’ Simulator sends result â†’ Mirth routes to LIS â†’ Resolver flags H/L â†’ KTV approves on UI â†’ PDF generated."
+    assigned_role: "qa-lead-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-061"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-01T23:46:36.4894049+07:00"
+    deadline: "2026-04-20"
+    acceptance_criteria:
+      - "Full lifecycle completes without manual intervention (except approve click)"
+      - "Order state transitions verified at each step"
+      - "PDF contains correct patient, test, value, flag data"
+      - "Meta view shows correct TestCatalog data"
+    output_files:
+      - "output/playwright/task_062_harness.py"
+      - "output/playwright/task_062_browser_check.mjs"
+      - "output/playwright/task-062/"
+      - "output/pdf/task_062_report.pdf"
+      - "MyTeam/.hub/done/TASK-062.md"
+
+  - id: "TASK-063"
+    title: "QA: Negative Path Tests (Retry, Idempotency, Resolver, Restart)"
+    description: "Execute all 4 negative path tests from Spec Â§8: Mirth retry/recover, duplicate idempotency, resolver fallbacks (3 sub-cases), restart persistency."
+    assigned_role: "qa-lead-agent"
+    priority: "P0"
+    status: "done"
+    dependencies: ["TASK-062"]
+    created_at: "2026-04-01T11:54:00+07:00"
+    completed_at: "2026-04-02T00:17:15.6801942+07:00"
+    deadline: "2026-04-22"
+    acceptance_criteria:
+      - "Mirth retry: Gateway downâ†’up, order syncs, ACK received"
+      - "Duplicate: same idempotency_key produces 1 inbox record"
+      - "Resolver: range_unresolved, unit_mismatch, unknown_test all handled correctly"
+      - "Restart: LIS restart preserves all order states and inbox data"
+    output_files:
+      - "output/playwright/task_063_harness.py"
+      - "output/playwright/task_063_negative_check.py"
+      - "output/playwright/task-063/"
+      - "output/pdf/task_063_restart_persisted_report.pdf"
+      - "MyTeam/.hub/done/TASK-063.md"
+
