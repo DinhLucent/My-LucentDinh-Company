@@ -67,6 +67,11 @@ In `backlog.yaml`, find tasks where:
    - [time] Started...
    ```
 3. Update `DASHBOARD.md` (move to IN PROGRESS, update Quick Context)
+4. Start git workflow for the task:
+   - `git pull --ff-only`
+   - create a task branch (see `GIT_WORKFLOW.md`)
+   - keep this task isolated from unrelated changes
+
 
 ## Step 3: EXECUTE
 
@@ -99,6 +104,13 @@ In `backlog.yaml`, find tasks where:
    - **Tasks**: move to DONE
    - **Timeline**: add 1 line (`[date] agent — COMPLETED: description`)
 
+5. Complete git gate:
+   - run relevant tests
+   - verify `git status`
+   - commit task changes before marking `done`
+   - if remote/review exists, push branch and open/update PR
+   - record branch / commit / PR status in the completion report
+
 ### 🚫 GATE — MANDATORY before this task is considered DONE:
 
 > **You MUST now perform ONBOARDING Phase 5: Shutdown Ritual.** 
@@ -107,11 +119,15 @@ In `backlog.yaml`, find tasks where:
 > 1. Write FULL report to `.hub/done/TASK-xxx.md`.
 > 2. Create Handoff file if needed.
 > 3. Update Dashboard status (🟢/🟡/🔴).
+> 4. **Complete Git workflow gate from `GIT_WORKFLOW.md`**.
 >
-> | Situation | Action |
-> | :--- | :--- |
-> | YES — another agent takes over | **MUST** create handoff file (Step 5) |
-> | NO — final task | Skip handoff, write `"No handoff needed"` in report |
+> If there is code or doc output, there should be at least one commit before moving the task to `done`.
+
+| Situation | Action |
+| :--- | :--- |
+| YES — another agent takes over | **MUST** create handoff file (Step 5) |
+| NO — final task | Skip handoff, write `"No handoff needed"` in report |
+
 
 
 ## Step 5: HANDOFF (required if next agent exists)

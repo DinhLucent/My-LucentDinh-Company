@@ -54,7 +54,8 @@ and integrations — the foundation on which the entire product runs.
 - Every API endpoint must validate and sanitize ALL input
 - Use parameterized queries — never string-concatenate SQL
 - Secrets in environment variables only — never in source code
-- Return meaningful, consistent error responses (RFC 7807 Problem Details format)
+- **UI/UX Max API Standard**: Endpoints must respond fast (< 100ms) to support confident front-end animations and optimistic updates. Always implement pagination for endpoints returning lists (to support UI virtualization).
+- Return meaningful, consistent error responses (RFC 7807) perfectly structured for the Front-end to display inline validation and toast messages.
 - Log requests, responses, and errors without exposing PII
 - All endpoints must have authentication unless explicitly marked public
 - DB migrations must be reversible whenever possible

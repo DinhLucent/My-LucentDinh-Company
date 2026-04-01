@@ -31,6 +31,10 @@ agents:
       - "Skills/Roles/Architecture/reverse-document"
       - ".skills_pool/claude-skills/engineering-team/tech-stack-evaluator"
       - ".skills_pool/claude-skills/engineering-team/senior-architect"
+      - ".skills_pool/superpowers/brainstorming"
+      - ".skills_pool/superpowers/writing-plans"
+      - ".skills_pool/superpowers/dispatching-parallel-agents"
+      - ".skills_pool/superpowers/subagent-driven-development"
 
   - id: "technical-director-agent"
     name: "Technical Director"
@@ -46,6 +50,10 @@ agents:
       - "Skills/Roles/Architecture/architecture-decision"
       - "Skills/Roles/Development/code-review"
       - "Skills/Roles/Development/tech-debt"
+      - ".skills_pool/superpowers/brainstorming"
+      - ".skills_pool/superpowers/writing-plans"
+      - ".skills_pool/superpowers/dispatching-parallel-agents"
+      - ".skills_pool/superpowers/subagent-driven-development"
 
   # ═══════════════════════════════════════════
   # DEVELOPMENT DEPARTMENT
@@ -60,6 +68,10 @@ agents:
       - "Skills/Roles/Development/team-backend"
       - ".skills_pool/claude-skills/engineering-team/senior-backend"
       - ".skills_pool/claude-skills/engineering-team/tdd-guide"
+      - ".skills_pool/superpowers/test-driven-development"
+      - ".skills_pool/superpowers/using-git-worktrees"
+      - ".skills_pool/superpowers/requesting-code-review"
+      - ".skills_pool/superpowers/finishing-a-development-branch"
 
   - id: "frontend-agent"
     name: "Frontend Developer"
@@ -69,6 +81,10 @@ agents:
       - "Skills/Roles/Development/design-review"
       - "Skills/Roles/Development/design-system"
       - "Skills/Roles/Development/team-frontend"
+      - ".skills_pool/superpowers/test-driven-development"
+      - ".skills_pool/superpowers/using-git-worktrees"
+      - ".skills_pool/superpowers/requesting-code-review"
+      - ".skills_pool/superpowers/finishing-a-development-branch"
 
   - id: "fullstack-agent"
     name: "Fullstack Developer"
@@ -79,6 +95,10 @@ agents:
       - "Skills/Roles/Development/db-review"
       - "Skills/Roles/Development/team-feature"
       - ".skills_pool/claude-skills/engineering-team/senior-fullstack"
+      - ".skills_pool/superpowers/test-driven-development"
+      - ".skills_pool/superpowers/using-git-worktrees"
+      - ".skills_pool/superpowers/requesting-code-review"
+      - ".skills_pool/superpowers/finishing-a-development-branch"
 
   - id: "ui-programmer-agent"
     name: "UI Programmer"
@@ -159,6 +179,8 @@ agents:
       - "Skills/Roles/Management/team-release"
       - ".skills_pool/claude-skills/project-management/senior-pm"
       - ".skills_pool/claude-skills/project-management/scrum-master"
+      - ".skills_pool/superpowers/writing-plans"
+      - ".skills_pool/superpowers/dispatching-parallel-agents"
 
   - id: "release-manager-agent"
     name: "Release Manager"
@@ -248,3 +270,5 @@ groups:
     - "Skills/Global/project-stage-detect"
     - "Skills/Global/Evolution"
     - "Skills/Global/security-rules"
+    - ".skills_pool/superpowers/verification-before-completion"
+    - ".skills_pool/superpowers/systematic-debugging"

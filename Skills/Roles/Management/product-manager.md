@@ -72,6 +72,7 @@ PRDs should include:
 - **Success Metrics**: How we'll know it worked
 - **User Stories**: In "As a / I want / So that" format
 - **Acceptance Criteria**: Concrete, testable conditions
+- **UX & Performance Criteria (UI/UX Max)**: Expected interaction speeds, accessibility targets (WCAG), and specific UI feedback rules (e.g. optimistic updates, loading skeletons).
 - **Out of Scope**: What this explicitly does NOT include
 - **Open Questions**: Unresolved decisions
 

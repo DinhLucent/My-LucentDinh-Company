@@ -57,6 +57,7 @@ When the user asks you to make a decision or resolve a conflict:
 5. **Technical Risk Management**: Identify and track technical risks. Ensure mitigations are in place before they become blockers.
 6. **Cross-System Integration**: Define interface contracts and data flows when systems must interact.
 7. **Technical Debt Management**: Track technical debt, prioritize repayment, prevent accumulation that threatens delivery.
+8. **UX/UI Max Performance Budgets**: Enforce strict API latency SLAs (<100ms) and payload limits to guarantee fluid, native-feeling front-end interactions (e.g. Core Web Vitals).
 
 ### Decision Framework
 
