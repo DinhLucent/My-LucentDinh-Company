@@ -1,0 +1,274 @@
+# Agent Skill Mapping Manifest
+# Each agent has: id, name, persona (role definition), and skills (tools)
+# All agents also inherit skills from groups.global
+# Task Hub skill (task-hub) is auto-inherited — agents MUST follow Hub protocol
+
+# ═══════════════════════════════════════════
+# ACTIVE AGENTS — Only these are loaded per session
+# Edit this list per project to save tokens
+# ═══════════════════════════════════════════
+active_agents:
+  - "cto-agent"
+  - "backend-agent"
+  - "fullstack-agent"
+  - "security-agent"
+  - "qa-lead-agent"
+  - "producer-agent"
+  - "ui-programmer-agent"
+  - "ux-designer-agent"
+  # Add/remove agents as needed per project
+
+agents:
+  # ═══════════════════════════════════════════
+  # ARCHITECTURE DEPARTMENT
+  # ═══════════════════════════════════════════
+  - id: "cto-agent"
+    name: "Chief Technical Officer"
+    persona: "Skills/Roles/Architecture/cto.md"
+    skills:
+      - "Skills/Roles/Architecture/architecture-decision"
+      - "Skills/Roles/Architecture/map-systems"
+      - "Skills/Roles/Architecture/reverse-document"
+      - ".skills_pool/claude-skills/engineering-team/tech-stack-evaluator"
+      - ".skills_pool/claude-skills/engineering-team/senior-architect"
+      - ".skills_pool/superpowers/brainstorming"
+      - ".skills_pool/superpowers/writing-plans"
+      - ".skills_pool/superpowers/dispatching-parallel-agents"
+      - ".skills_pool/superpowers/subagent-driven-development"
+
+  - id: "technical-director-agent"
+    name: "Technical Director"
+    persona: "Skills/Roles/Architecture/technical-director.md"
+    skills:
+      - "Skills/Roles/Architecture/architecture-decision"
+      - "Skills/Roles/Architecture/map-systems"
+
+  - id: "lead-programmer-agent"
+    name: "Lead Programmer"
+    persona: "Skills/Roles/Architecture/lead-programmer.md"
+    skills:
+      - "Skills/Roles/Architecture/architecture-decision"
+      - "Skills/Roles/Development/code-review"
+      - "Skills/Roles/Development/tech-debt"
+      - ".skills_pool/superpowers/brainstorming"
+      - ".skills_pool/superpowers/writing-plans"
+      - ".skills_pool/superpowers/dispatching-parallel-agents"
+      - ".skills_pool/superpowers/subagent-driven-development"
+
+  # ═══════════════════════════════════════════
+  # DEVELOPMENT DEPARTMENT
+  # ═══════════════════════════════════════════
+  - id: "backend-agent"
+    name: "Backend Developer"
+    persona: "Skills/Roles/Development/backend-developer.md"
+    skills:
+      - "Skills/Roles/Development/api-design"
+      - "Skills/Roles/Development/code-review"
+      - "Skills/Roles/Development/db-review"
+      - "Skills/Roles/Development/team-backend"
+      - ".skills_pool/claude-skills/engineering-team/senior-backend"
+      - ".skills_pool/claude-skills/engineering-team/tdd-guide"
+      - ".skills_pool/superpowers/test-driven-development"
+      - ".skills_pool/superpowers/using-git-worktrees"
+      - ".skills_pool/superpowers/requesting-code-review"
+      - ".skills_pool/superpowers/finishing-a-development-branch"
+
+  - id: "frontend-agent"
+    name: "Frontend Developer"
+    persona: "Skills/Roles/Development/frontend-developer.md"
+    skills:
+      - "Skills/Roles/Development/code-review"
+      - "Skills/Roles/Development/design-review"
+      - "Skills/Roles/Development/design-system"
+      - "Skills/Roles/Development/team-frontend"
+      - ".skills_pool/superpowers/test-driven-development"
+      - ".skills_pool/superpowers/using-git-worktrees"
+      - ".skills_pool/superpowers/requesting-code-review"
+      - ".skills_pool/superpowers/finishing-a-development-branch"
+
+  - id: "fullstack-agent"
+    name: "Fullstack Developer"
+    persona: "Skills/Roles/Development/fullstack-developer.md"
+    skills:
+      - "Skills/Roles/Development/api-design"
+      - "Skills/Roles/Development/code-review"
+      - "Skills/Roles/Development/db-review"
+      - "Skills/Roles/Development/team-feature"
+      - ".skills_pool/claude-skills/engineering-team/senior-fullstack"
+      - ".skills_pool/superpowers/test-driven-development"
+      - ".skills_pool/superpowers/using-git-worktrees"
+      - ".skills_pool/superpowers/requesting-code-review"
+      - ".skills_pool/superpowers/finishing-a-development-branch"
+
+  - id: "ui-programmer-agent"
+    name: "UI Programmer"
+    persona: "Skills/Roles/Development/ui-programmer.md"
+    skills:
+      - "Skills/Roles/Development/design-system"
+      - "Skills/Roles/Development/team-ui"
+      - "Skills/Roles/Development/localize"
+      - ".skills_pool/ui-ux-pro-max"
+
+  - id: "ai-programmer-agent"
+    name: "AI Programmer"
+    persona: "Skills/Roles/Development/ai-programmer.md"
+    skills:
+      - "Skills/Roles/Development/code-review"
+      - "Skills/Roles/Development/prototype"
+
+  - id: "network-programmer-agent"
+    name: "Network Programmer"
+    persona: "Skills/Roles/Development/network-programmer.md"
+    skills:
+      - "Skills/Roles/Development/api-design"
+      - "Skills/Roles/Development/code-review"
+
+  - id: "tools-programmer-agent"
+    name: "Tools Programmer"
+    persona: "Skills/Roles/Development/tools-programmer.md"
+    skills:
+      - "Skills/Roles/Development/code-review"
+      - "Skills/Roles/Development/prototype"
+
+  # ═══════════════════════════════════════════
+  # QUALITY DEPARTMENT
+  # ═══════════════════════════════════════════
+  - id: "qa-lead-agent"
+    name: "QA Lead"
+    persona: "Skills/Roles/Quality/qa-lead.md"
+    skills:
+      - "Skills/Roles/Quality/bug-report"
+      - "Skills/Roles/Quality/gate-check"
+      - "Skills/Roles/Quality/release-checklist"
+      - "Skills/Roles/Quality/launch-checklist"
+      - ".skills_pool/claude-skills/engineering-team/senior-qa"
+      - ".skills_pool/claude-skills/engineering-team/playwright-pro"
+
+  - id: "qa-tester-agent"
+    name: "QA Tester"
+    persona: "Skills/Roles/Quality/qa-tester.md"
+    skills:
+      - "Skills/Roles/Quality/bug-report"
+      - "Skills/Roles/Quality/mobile-review"
+
+  - id: "performance-analyst-agent"
+    name: "Performance Analyst"
+    persona: "Skills/Roles/Quality/performance-analyst.md"
+    skills:
+      - "Skills/Roles/Quality/perf-profile"
+      - "Skills/Roles/Quality/gate-check"
+
+  # ═══════════════════════════════════════════
+  # MANAGEMENT DEPARTMENT
+  # ═══════════════════════════════════════════
+  - id: "product-manager-agent"
+    name: "Product Manager"
+    persona: "Skills/Roles/Management/product-manager.md"
+    skills:
+      - "Skills/Roles/Management/sprint-plan"
+      - "Skills/Roles/Management/estimate"
+      - "Skills/Roles/Management/milestone-review"
+
+  - id: "producer-agent"
+    name: "Producer"
+    persona: "Skills/Roles/Management/producer.md"
+    skills:
+      - "Skills/Roles/Management/sprint-plan"
+      - "Skills/Roles/Management/estimate"
+      - "Skills/Roles/Management/retrospective"
+      - "Skills/Roles/Management/team-release"
+      - ".skills_pool/claude-skills/project-management/senior-pm"
+      - ".skills_pool/claude-skills/project-management/scrum-master"
+      - ".skills_pool/superpowers/writing-plans"
+      - ".skills_pool/superpowers/dispatching-parallel-agents"
+
+  - id: "release-manager-agent"
+    name: "Release Manager"
+    persona: "Skills/Roles/Management/release-manager.md"
+    skills:
+      - "Skills/Roles/Management/team-release"
+      - "Skills/Roles/Quality/release-checklist"
+      - "Skills/Roles/Quality/launch-checklist"
+
+  - id: "community-manager-agent"
+    name: "Community Manager"
+    persona: "Skills/Roles/Management/community-manager.md"
+    skills:
+      - "Skills/Roles/Management/changelog"
+      - "Skills/Roles/Management/patch-notes"
+
+  # ═══════════════════════════════════════════
+  # SPECIALIST — SECURITY
+  # ═══════════════════════════════════════════
+  - id: "security-agent"
+    name: "Security Engineer"
+    persona: "Skills/Roles/Specialist/Security/security-engineer.md"
+    skills:
+      - "Skills/Roles/Specialist/Security/deep-scan"
+      - "Skills/Roles/Specialist/Security/secret-audit"
+      - "Skills/Roles/Specialist/Security/threat-model"
+      - ".skills_pool/claude-skills/engineering-team/senior-security"
+      - ".skills_pool/claude-skills/engineering-team/security-pen-testing"
+
+  # ═══════════════════════════════════════════
+  # SPECIALIST — DEVOPS
+  # ═══════════════════════════════════════════
+  - id: "devops-agent"
+    name: "DevOps Engineer"
+    persona: "Skills/Roles/Specialist/DevOps/devops-engineer.md"
+    skills:
+      - "Skills/Roles/Specialist/DevOps/hotfix"
+
+  # ═══════════════════════════════════════════
+  # SPECIALIST — DESIGN
+  # ═══════════════════════════════════════════
+  - id: "ux-designer-agent"
+    name: "UX Designer"
+    persona: "Skills/Roles/Specialist/Design/ux-designer.md"
+    skills:
+      - "Skills/Roles/Development/design-system"
+      - "Skills/Roles/Development/design-review"
+      - ".skills_pool/ui-ux-pro-max"
+
+  - id: "ux-researcher-agent"
+    name: "UX Researcher"
+    persona: "Skills/Roles/Specialist/Design/ux-researcher.md"
+    skills:
+      - "Skills/Roles/Development/design-review"
+
+  - id: "accessibility-agent"
+    name: "Accessibility Specialist"
+    persona: "Skills/Roles/Specialist/Design/accessibility-specialist.md"
+    skills:
+      - "Skills/Roles/Development/design-review"
+
+  # ═══════════════════════════════════════════
+  # SPECIALIST — DATA
+  # ═══════════════════════════════════════════
+  - id: "data-engineer-agent"
+    name: "Data Engineer"
+    persona: "Skills/Roles/Specialist/Data/data-engineer.md"
+    skills:
+      - "Skills/Roles/Development/db-review"
+
+  - id: "analytics-engineer-agent"
+    name: "Analytics Engineer"
+    persona: "Skills/Roles/Specialist/Data/analytics-engineer.md"
+    skills:
+      - "Skills/Roles/Development/db-review"
+
+# ═══════════════════════════════════════════
+# SHARED SKILL GROUPS
+# ═══════════════════════════════════════════
+groups:
+  global:
+    - "Skills/Global/task-hub"
+    - "Skills/Global/brainstorm"
+    - "Skills/Global/onboard"
+    - "Skills/Global/start"
+    - "Skills/Global/scope-check"
+    - "Skills/Global/project-stage-detect"
+    - "Skills/Global/Evolution"
+    - "Skills/Global/security-rules"
+    - ".skills_pool/superpowers/verification-before-completion"
+    - ".skills_pool/superpowers/systematic-debugging"
