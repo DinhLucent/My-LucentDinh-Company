@@ -78,6 +78,10 @@ Follow team workflows: `ONBOARDING.md` → `OPERATING_RULES.md` → `GIT_WORKFLO
 
 **Per task:** Claim → Read context → Plan → Implement → Test → PR → Update context if changed → Handoff.
 
+> [!TIP]
+> **Use the [Interactive Prompt Builder](file:///d:/MyProject/MyAgentSkills/tools/prompt-builder/index.html)**
+> Open `tools/prompt-builder/index.html` in your browser. This tool helps you select a scenario (Debugging, Refactoring, Spec Writing), fill in a form, and generates a perfectly formatted prompt for you to copy into your AI session.
+
 **Keep context alive:** New discovery → update context file. Architecture change → update diagram. New debt → log it.
 
 ---

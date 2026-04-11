@@ -1,13 +1,13 @@
 # Git Workflow Standard
 
-> Companion to `OPERATING_RULES.md` and `Skills/Global/task-hub/SKILL.md`.
+> Companion to `OPERATING_RULES.md` and the automated orchestrator workflow.
 
 ---
 
 ## 1. Purpose
 
 This workflow closes the gap between task lifecycle and git lifecycle. 
-Task Hub tracks ownership and reporting. Git tracks actual code history, review, and delivery.
+The orchestrator (`run_orchestrator.py`) tracks execution and verification. Git tracks actual code history, review, and delivery.
 Both must move together.
 
 ---
@@ -17,7 +17,7 @@ Both must move together.
 - **One task = one branch**
 - **One logical change = one commit**
 - **No task is truly done until it is committed**
-- If remote/review exists, push + PR before final handoff
+- If remote/review exists, push + PR before final completion
 - Do not mix unrelated task changes on the same branch
 
 ---
@@ -29,9 +29,9 @@ Before writing code:
 1. Update base branch
    - `git pull --ff-only`
 2. Create a task branch
-   - Preferred: `codex/<task-id>-<short-slug>`
-   - Example: `codex/task-053-freeze-contracts`
-3. Claim the task in Hub
+   - Preferred: `codex/<task-id>-<slug>`
+   - Example: `codex/TASK-001-freeze-contracts`
+3. Prepare your `task.yaml`
 4. Start implementation
 
 ---
@@ -40,26 +40,20 @@ Before writing code:
 
 - Commit in small logical increments.
 - Prefer commit messages that explain the actual change (Conventional Commits if possible).
-- Example: `feat(hub): add git gates to task protocol`
+- Example: `feat(core): add validator to orchestrator loop`
 
 ---
 
-## 5. Before Marking DONE in Hub
+## 5. Before Marking Session Complete
 
 Complete this checklist:
 
-1. Run relevant tests
+1. Run relevant tests or use `python run_orchestrator.py run path/to/task.yaml`
 2. Review `git status`
 3. Stage only intended task files
 4. Commit task changes
 5. If remote/review exists: push branch and create/update PR
-6. Then update:
-   - Hub active/done files
-   - `DASHBOARD.md`
-
-### Minimum Gate
-
-If there is code or doc output, the task **should have at least one commit** before it is moved to `done`.
+6. Ensure orchestrator status is `passed`
 
 ---
 
@@ -68,7 +62,7 @@ If there is code or doc output, the task **should have at least one commit** bef
 Use:
 - lowercase
 - short descriptive slug
-- task id included
+- task id included (e.g., `TASK-001`)
 
 Avoid:
 - `test`, `fix`, `new-branch`
@@ -78,7 +72,7 @@ Avoid:
 
 ## 7. Handoff Expectations
 
-When handing off to another agent:
+When handing off to another agent or phase:
 - mention the branch name
 - mention commit hash if useful
 - state whether branch is local only or pushed

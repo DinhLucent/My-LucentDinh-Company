@@ -1,0 +1,67 @@
+window.promptRegistry = window.promptRegistry || [];
+
+window.promptRegistry.push({
+    id: "understand_architecture",
+    title: "Vẽ bản đồ kiến trúc",
+    category: "Understand",
+    tags: ["architecture", "mapping", "mental-model"],
+    description: "Xác định các module lõi, entrypoints và luồng dữ liệu của hệ thống.",
+    use_when: ["Muốn hiểu framework đang dùng", "Cần vẽ diagram", "Xác định core vs glue code"],
+    avoid_when: ["Đã hiểu rõ hệ thống", "Sửa bug nhỏ"],
+    fields: [
+        { id: "system_context", label: "Hệ thống / Repo", type: "text", required: true },
+        { id: "core_goal", label: "Mục tiêu cốt lõi", type: "text", required: true },
+        { id: "current_confusion", label: "Phần đang gây rối nhất", type: "textarea" },
+        { id: "constraints", label: "Giới hạn (Constraints)", type: "text", default: "Giữ nguyên kiến trúc hiện tại" }
+    ],
+    template: `Bối cảnh:
+- Dự án: {{system_context}}
+- Mục tiêu: {{core_goal}}
+- Giới hạn: {{constraints}}
+
+Tôi muốn bạn giúp tôi lập bản đồ kiến trúc hiện tại của repo này.
+
+Hãy làm theo thứ tự:
+1. Xác định entrypoints chính
+2. Xác định các module lõi
+3. Vẽ luồng dữ liệu và luồng control flow
+4. Chỉ ra state machine / orchestrator / adapters nằm ở đâu
+5. Nêu module nào đóng vai trò "core kernel"
+6. Nêu module nào chỉ là glue code
+
+Thông tin bổ sung về phần đang rối:
+{{current_confusion}}
+
+Đầu ra mong muốn:
+- Kiến trúc theo từng khối chức năng
+- Trách nhiệm của từng khối
+- File/Function chính cho mỗi khối`
+});
+
+window.promptRegistry.push({
+    id: "understand_onboarding",
+    title: "Onboarding Thực Chiến",
+    category: "Understand",
+    tags: ["newcomer", "onboarding", "quick-start"],
+    description: "Dùng cho người mới tham gia dự án cần nắm bắt logic nhanh nhất.",
+    fields: [
+        { id: "system_context", label: "Tên Repo", type: "text", required: true },
+        { id: "feature_focus", label: "Feature tôi sắp làm", type: "text" }
+    ],
+    template: `Tôi sắp tham gia tiếp tục phát triển repo {{system_context}}.
+
+Hãy giúp tôi onboarding kỹ thuật theo hướng thực chiến.
+
+Việc cần làm:
+1. Repo này giải bài toán cốt lõi gì?
+2. Entry points chính nằm ở đâu?
+3. Luồng chạy end-to-end đi qua những file nào?
+4. Module nào là lõi, module nào là phụ trợ?
+5. Nếu tôi muốn sửa feature {{feature_focus}}, tôi nên đọc file nào trước?
+6. Nếu tôi muốn debug issue production, tôi nên bắt đầu từ đâu?
+
+Đầu ra:
+- Một bản mental model ngắn gọn của hệ thống
+- Danh sách file quan trọng nhất
+- Thứ tự đọc code đề xuất cho người mới.`
+});

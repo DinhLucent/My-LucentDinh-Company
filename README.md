@@ -1,227 +1,384 @@
-# 🏢 LucentDinhCompany — Trung Tâm Điều Hành Agent AI
+# Agents-of-SHIELD
 
-> **Mục tiêu:** Biến session AI của bạn thành một phòng ban phát triển phần mềm chuyên nghiệp.
-> **Version:** 3.2 | **Framework:** Diamond Standard + Task Hub
+Control plane cục bộ để đưa một “đội AI” vào dự án phần mềm theo quy trình có packet, verifier, retry và task state rõ ràng.
 
----
+## Nếu bạn hoàn toàn mới, hãy làm theo đúng 5 bước này
 
-## Mục lục
-
-1. [Tổng quan](#1-tổng-quan)
-2. [Kiến trúc hệ thống](#2-kiến-trúc-hệ-thống)
-3. [Task Hub — Cách Agent giao tiếp](#3-task-hub--cách-agent-giao-tiếp)
-4. [Quy trình End-to-End](#4-quy-trình-end-to-end)
-5. [Bắt đầu sử dụng](#5-bắt-đầu-sử-dụng)
-6. [Đội ngũ AI & Slash Commands](#6-đội-ngũ-ai--slash-commands)
-7. [Nguyên tắc cốt lõi](#7-nguyên-tắc-cốt-lõi)
-
----
-
-## 1. Tổng quan
-
-**LucentDinhCompany** là **Trụ sở chính (HQ)** của một đội ngũ AI Agent chuyên nghiệp. Thay vì một AI đơn lẻ làm mọi việc, hệ thống cung cấp **27 "nhân viên" AI** với Persona và kỹ năng riêng biệt, được trang bị các bộ Skill chuyên sâu (như UI/UX Pro Max cho thiết kế giao diện).
-
-Bạn vẫn là CEO — người ra quyết định cuối cùng.
-
-- **Task Hub**: Trung tâm giao tiếp duy nhất — Agent tự lấy task đúng role
-- **Role Enforcement**: Sai role → Agent bị từ chối, không thực hiện
-- **Session Recovery**: AI mới vào đọc Dashboard 10 giây nắm ngay bối cảnh
-- **Compact Reporting**: Sơ lược cho AI, chi tiết cho CEO
-
----
-
-## 2. Kiến trúc hệ thống
-
-```
-LucentDinhCompany/
-├── manifest.yaml           ← Sổ cái nhân sự (Agent → Persona → Skills)
-├── DASHBOARD.md            ← 📊 Quick Context + Task Board + Timeline
-├── ONBOARDING.md           ← Checklist nhận việc cho Agent mới
-├── OFFBOARDING.md          ← Checklist sa thải / rút lui Agent
-├── RECRUITMENT.md          ← Quy trình thuê Agent mới
-├── OPERATING_RULES.md      ← Quy tắc vận hành (tóm tắt)
-├── .hub/                   ← 🏗️ TASK HUB
-│   ├── backlog.yaml        ← Hàng đợi task (gán theo role)
-│   ├── active/             ← Task đang thực hiện
-│   ├── done/               ← Báo cáo chi tiết cho CEO
-│   └── handoffs/           ← Chuyển giao giữa Agent
-├── Skills/
-│   ├── Global/             ← Skills chung (task-hub, security, evolution...)
-│   └── Roles/              ← Skills chuyên môn theo phòng ban
-├── .skills_pool/            ← 🧰 Kho Skill mở rộng (bên thứ 3)
-│   └── ui-ux-pro-max/      ← Design Intelligence (67 styles, 161 palettes)
-└── templates/              ← Khuôn mẫu task, handoff, skill
-```
-
----
-
-## 3. Task Hub — Cách Agent giao tiếp
-
-### Agent KHÔNG nói chuyện trực tiếp
-
-```
-       ┌──────────────┐
-       │   TASK HUB   │
-       │ backlog.yaml │
-       │ DASHBOARD.md │
-       └──────┬───────┘
-    ┌─────────┼───────────┐
-┌───▼───┐ ┌──▼────┐ ┌───▼──────┐
-│  CTO  │ │Backend│ │ Security │
-└───────┘ └───────┘ └──────────┘
-Tất cả đọc/ghi vào Hub. Không có đường nối ngang.
-```
-
-### Luồng hoạt động
-
-```
-1. User/Producer tạo task → backlog.yaml (gán assigned_role)
-2. Agent mở session → Đọc Dashboard → Đọc backlog → Tìm task đúng role
-3. Agent claim → Thực hiện → Cập nhật Dashboard (1 dòng)
-4. Agent tạo handoff file → Task mới cho Agent tiếp theo
-5. ❌ User KHÔNG cần copy-paste giữa session
-```
-
-### Quy tắc nghiêm ngặt
-
-- ✅ `assigned_role` = Agent ID của bạn → ĐƯỢC nhận
-- ❌ `assigned_role` ≠ Agent ID → **PHẢI TỪ CHỐI**, không thực hiện dù 1 dòng
-- ❌ Không có task phù hợp → Báo User: "Không có task cho role của tôi"
-
-### Khi session bị kill / đổi AI
-
-AI mới vào → Đọc `DASHBOARD.md` (Quick Context) → Backlog → Handoffs → Bắt đầu làm. Không cần User giải thích lại.
-
-> 📖 Chi tiết protocol: `Skills/Global/task-hub/SKILL.md`
-
----
-
-## 4. Quy trình End-to-End
-
-```
-[⬜ PLAN] → [⬜ DESIGN] → [⬜ IMPLEMENT] → [⬜ REVIEW] → [⬜ RELEASE]
-```
-
-| Phase | Ai làm | Kết quả |
-|-------|--------|---------|
-| **PLANNING** | Producer/PM | Tạo tasks vào Hub, gán role |
-| **DESIGN** | CTO | Kiến trúc, API contract, ADR |
-| **IMPLEMENT** | Backend/Frontend | Code + Test, lấy task từ Hub |
-| **REVIEW** | Lead + Security + QA | Code review, security scan, gate check |
-| **RELEASE** | Release Manager + DevOps | Build, deploy, monitor |
-
-### Task Lifecycle
-
-```
-TODO → CLAIMED → IN_PROGRESS → IN_REVIEW → DONE
-```
-
-### Báo cáo: 2 tầng
-
-| Tầng | Nơi lưu | Cho ai | Dung lượng |
-|------|---------|--------|-----------|
-| Sơ lược | `DASHBOARD.md` | AI khác | 1 dòng |
-| Chi tiết | `.hub/done/TASK-xxx.md` | CEO | Đầy đủ |
-
-> 📖 Chi tiết rules: `OPERATING_RULES.md` (50 dòng)
-
----
-
-## 5. Bắt đầu sử dụng
-
-### Bước 1: Clone vào dự án
+1. Compile knowledge và indexes:
 
 ```bash
-git clone https://github.com/<your-username>/LucentDinhCompany.git .agents-skills
+python run_orchestrator.py compile
 ```
 
-### Bước 2: Chọn đội hình
+2. Copy mẫu task từ [templates/task.yaml](templates/task.yaml).
+3. Điền task thật của bạn, đặc biệt là:
+   - `title`
+   - `description`
+   - `inputs.related_paths`
+   - `acceptance_criteria`
+   - `metadata.execution.primary_commands`
+4. Xem packet và runtime plan trước khi chạy:
 
-| Quy mô | Đội hình |
-|--------|---------|
-| Nhỏ | `fullstack-agent` + `qa-lead-agent` + `security-agent` |
-| Trung bình | + `cto-agent` + `producer-agent` + `frontend-agent` |
-| Lớn | Full team (active agents trong manifest) |
-
-### Bước 3: Khởi chạy
-
-| Trạng thái | Chạy | Kết quả |
-|-----------|------|---------|
-| Chỉ có ý tưởng | `/brainstorm` | Cụ thể hóa |
-| Có concept | `/map-systems` | Phân rã module |
-| Có thiết kế | `/sprint-plan` | Tasks vào Hub |
-| Có code sẵn | `/project-stage-detect` | Phân tích phase |
-
-### Bước 4: Thực thi
-
+```bash
+python run_orchestrator.py plan path/to/task.yaml
 ```
-Mở session Agent → Agent tự đọc Hub → Lấy task đúng role → Thực hiện → Cập nhật Dashboard
-Mở session Agent khác → Agent đọc Hub → Thấy handoff → Tiếp tục → Không cần copy-paste
+
+5. Chạy end-to-end:
+
+```bash
+python run_orchestrator.py run path/to/task.yaml
+```
+
+Nếu bạn chỉ nhớ một điều: `plan` để preview, `run` để execute thật.
+
+---
+
+## Hệ thống này làm gì?
+
+Khi bạn chạy một task, control plane sẽ đi theo flow:
+
+```text
+task.yaml
+  -> classify
+  -> route
+  -> build task packet
+  -> execute
+  -> verify
+  -> retry nếu fail
+  -> complete hoặc escalate
+```
+
+Hệ thống không còn chỉ là handbook markdown. Ở HEAD hiện tại, nó đã có:
+
+- compile layer sinh indexes và fragments
+- orchestrator có execution loop thật
+- verifier runners thật
+- retry packet augmentation thật
+- task state machine thật
+- CLI `run` đi qua loop execution/verification/retry
+
+---
+
+## Khi đưa hệ thống vào một dự án mới, nên làm gì?
+
+Đây là quy trình thực dụng nhất cho một người chưa biết gì:
+
+### Bước 1: hiểu repo và compile
+
+Chạy:
+
+```bash
+python run_orchestrator.py compile
+```
+
+Việc này sẽ sinh:
+
+- `role_index.json`
+- `skill_index.json`
+- `project_index.json`
+- `module_index.json`
+- `dashboard_snapshot.json`
+- các file trong `knowledge/compiled/context_fragments/`
+
+### Bước 2: bắt đầu bằng một task nhỏ và an toàn
+
+Đừng bắt đầu bằng task lớn. Hãy dùng một task kiểu:
+
+- tạo report nhỏ
+- chạy test/lint cụ thể
+- sửa một file
+- tạo một output file chứng minh executor đang chạy đúng
+
+Mục tiêu của task đầu tiên là xác nhận:
+
+- packet có gọn không
+- command có chạy được không
+- verifier có pass/fail đúng không
+- metrics có được ghi không
+
+### Bước 3: viết task contract rõ ràng
+
+Task tối thiểu cần có:
+
+- file/module liên quan
+- điều kiện hoàn thành rõ
+- command thực thi rõ
+
+Ví dụ ngắn:
+
+```yaml
+schema_version: "2.1"
+id: TASK-001
+title: Generate a small project status file
+description: >
+  Create a proof file in runtime/sessions so we can validate the execution loop.
+assigned_role: backend
+priority: medium
+status: queued
+domain: general
+
+inputs:
+  related_paths:
+    - control_plane/orchestrator.py
+  related_tests: []
+  related_handoffs: []
+  related_logs: []
+  related_modules:
+    - control_plane
+
+constraints:
+  - keep_packet_small
+
+acceptance_criteria:
+  - proof file created
+
+metadata:
+  created_by: user
+  created_at: "2026-04-12T00:00:00Z"
+  execution:
+    primary_commands:
+      - "New-Item -ItemType Directory -Force -Path 'runtime\\sessions' | Out-Null"
+      - "Set-Content -Path 'runtime\\sessions\\proof.txt' -Value 'ok' -Encoding utf8"
+    output_files:
+      - runtime/sessions/proof.txt
+```
+
+Lưu ý:
+
+- executor hiện tại là `command-driven`
+- muốn task chạy thật tốt, bạn phải khai báo `metadata.execution`
+- nếu muốn retry làm khác attempt đầu, thêm `retry_commands`
+
+### Bước 4: preview trước, chạy sau
+
+Preview:
+
+```bash
+python run_orchestrator.py plan path/to/task.yaml
+```
+
+Bạn nên kiểm:
+
+- `execution_mode`
+- `task_packet_path`
+- packet có kéo đúng `files`, `tests`, `context_fragments`
+
+Sau đó mới chạy:
+
+```bash
+python run_orchestrator.py run path/to/task.yaml
+```
+
+### Bước 5: đọc artifacts sau khi chạy
+
+Sau một lần `run`, bạn nên xem:
+
+- `runtime/state/task_packets/`
+- `runtime/state/agent_runs/`
+- `runtime/state/verification_reports/`
+- `runtime/reports/metrics/`
+- `.hub/done/`
+- `.hub/handoffs/` nếu task fail hoặc cần escalate
+
+---
+
+## `plan` và `run` khác nhau thế nào?
+
+### `plan`
+
+`plan` chỉ:
+
+- classify
+- route
+- decide execution mode
+- retrieve context
+- build packet
+- build runtime plan
+
+Nó không execute command, không chạy verifier, không retry.
+
+### `run`
+
+`run` là flow thật:
+
+- prepare task
+- execute command theo `metadata.execution`
+- run verifier
+- nếu fail thì sinh retry packet
+- retry trong giới hạn cho phép
+- complete hoặc fail/escalate
+
+---
+
+## Hệ thống ghi ra những gì?
+
+### Packet
+
+Task packet nằm ở:
+
+```text
+runtime/state/task_packets/
+```
+
+Packet chứa:
+
+- summary task
+- role
+- rules ngắn
+- fragments liên quan
+- files liên quan
+- tests liên quan
+
+### Execution report
+
+Execution report nằm ở:
+
+```text
+runtime/state/agent_runs/
+```
+
+Nó ghi:
+
+- commands đã chạy
+- return code
+- changed files
+- output files
+- stack trace nếu fail
+
+### Verification report
+
+Verification report nằm ở:
+
+```text
+runtime/state/verification_reports/
+```
+
+Nó ghi:
+
+- các check đã chạy
+- pass/fail
+- `next_context_needs`
+- `recommended_next_role`
+
+### Metrics
+
+Metrics nằm ở:
+
+```text
+runtime/reports/metrics/
+```
+
+Các số quan trọng:
+
+- `packet_size`
+- `loaded_file_count`
+- `retry_count`
+- `verifier_status`
+- `execution_mode`
+
+### Task state
+
+State machine ghi vào:
+
+- `runtime/state/active_tasks/`
+- `.hub/active/`
+- `.hub/done/`
+- `.hub/handoffs/`
+
+---
+
+## Cấu trúc repo nào quan trọng nhất?
+
+```text
+control_plane/
+  classifier/          classify task
+  router/              choose role + parallel mode
+  retriever/           select fragments/files/tests
+  context_builder/     build task packet
+  execution/           runtime planner + executor + state machine
+  verifier/            acceptance/lint/typecheck/test/security
+  hooks/               retry/handoff hooks
+
+templates/
+  task.yaml
+  task_packet.json
+  verification_report.json
+  module_index.json
+
+runtime/
+  state/
+  reports/
+  cache/
+
+.hub/
+  active/
+  done/
+  handoffs/
 ```
 
 ---
 
-## 6. Đội ngũ AI & Slash Commands
+## Các lệnh cần nhớ
 
-### Agents theo Tier
-
-```
-Tier 1 — Leadership (Opus / GPT-4o)
-  CTO • Technical Director • Producer
-
-Tier 2 — Department Leads (Sonnet / GPT-4o-mini)
-  Product Manager • Lead Programmer • QA Lead • UX Designer • Release Manager
-
-Tier 3 — Specialists (Sonnet / Gemini Flash)
-  Backend • Frontend • Fullstack • AI • Network • Tools
-  UI Programmer 🎨 • Security • DevOps • Data Engineer
-  (UI Programmer & UX Designer được trang bị UI/UX Pro Max v2.5)
-
-Tier 4 — Executors (Haiku / Flash)
-  QA Tester • Community Manager • Analytics Engineer
+```bash
+python run_orchestrator.py compile
+python run_orchestrator.py plan path/to/task.yaml
+python run_orchestrator.py run path/to/task.yaml
 ```
 
-### Chuỗi chỉ huy
+Nếu bạn quen dùng `make`:
 
+```bash
+make compile
+make plan TASK=path/to/task.yaml
+make orchestrate-task TASK=path/to/task.yaml
 ```
-Bạn (CEO)
-  ├── CTO → Tech Director → Lead Programmer → Developers
-  ├── Product Manager → UX Designer
-  ├── Producer → Phối hợp toàn bộ
-  └── QA Lead → QA Tester
-```
-
-### Slash Commands chính
-
-| Category | Commands |
-|----------|---------|
-| **Khởi chạy** | `/start` `/project-stage-detect` `/gate-check` |
-| **Thiết kế** | `/brainstorm` `/design-system` `/map-systems` `/prototype` |
-| **Code** | `/code-review` `/api-design` `/db-review` `/tech-debt` `/perf-profile` |
-| **Sprint** | `/sprint-plan` `/estimate` `/retrospective` `/release-checklist` `/changelog` |
-| **Team** | `/team-feature` `/team-backend` `/team-frontend` `/team-ui` `/team-release` |
-| **Design** | `/design-system` `/design-review` — tự động dùng UI/UX Pro Max engine |
-| **Security** | `/deep-scan` `/secret-audit` `/threat-model` |
 
 ---
 
-## 7. Nguyên tắc cốt lõi
+## Hệ thống này chưa làm gì?
 
-- **Bạn luôn là CEO** — Agents đề xuất, bạn quyết định
-- **Task Hub là Single Source of Truth** — Mọi task qua Hub
-- **Diamond Standard** — Output rõ ràng, có cấu trúc, chuyên nghiệp
-- **Verify trước Done** — Review trước Merge — Test trước Deploy
-- **STRESS Monitoring** — Tự theo dõi mức bộ ngộp context và độ mệt mỏi của Agent
+Để tránh kỳ vọng sai:
 
-### Tài liệu tham khảo
+- nó chưa phải agent “tự hiểu mọi task” không cần execution contract
+- nó chưa thay thế hoàn toàn việc thiết kế task rõ ràng
+- chất lượng runtime vẫn phụ thuộc:
+  - `metadata.execution`
+  - test harness của repo
+  - acceptance criteria
 
-| File | Nội dung |
-|------|----------|
-| `OPERATING_RULES.md` | Quy tắc vận hành (50 dòng) |
-| `ONBOARDING.md` | Checklist nhận việc (30 dòng) |
-| `RECRUITMENT.md` | Quy trình thuê Agent mới |
-| `Skills/Global/task-hub/SKILL.md` | Protocol Hub chi tiết |
-| `.skills_pool/ui-ux-pro-max/SKILL.md` | Design Intelligence (67 styles, 161 palettes, 57 fonts) |
+Nói ngắn:
+
+- kiến trúc runtime đã khép vòng
+- độ mượt production phụ thuộc chất lượng task contract
 
 ---
-*Chúc bạn xây dựng được đội ngũ AI hùng mạnh! 🚀*
+
+## Manual Task Hub mode còn dùng không?
+
+Còn, nhưng không phải đường nhanh nhất cho người mới.
+
+Repo này vẫn có:
+
+- `manifest.yaml`
+- `OPERATING_RULES.md`
+
+Những file đó phù hợp hơn với mode vận hành “mở nhiều session agent thủ công”.
+
+Nếu bạn là người mới và chỉ muốn dùng hệ thống ngay:
+
+- bắt đầu bằng `compile`
+- viết `task.yaml`
+- dùng `plan`
+- dùng `run`
+
+Đó là entrypoint đúng với control plane hiện tại.
+
+---
+
+## Nên đọc file nào tiếp theo?
+
+- [CHEATSHEET.md](CHEATSHEET.md): bản cực ngắn cho người mới
+- [templates/task.yaml](templates/task.yaml): mẫu task chuẩn
+- [OPERATING_RULES.md](OPERATING_RULES.md): nguyên tắc vận hành (V2)
+- [GIT_WORKFLOW.md](GIT_WORKFLOW.md): quy trình Git cho orchestrator

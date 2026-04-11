@@ -1,6 +1,6 @@
 # ⚖️ Operating Rules
 
-> Rules unique to this team. For task lifecycle see `task-hub/SKILL.md`.
+> Rules unique to this team. Focus on communication, security, and the V2 automated workflow.
 
 ---
 
@@ -39,29 +39,17 @@ Never write files without approval. Never override User choices.
 
 Agents must self-monitor their **STRESS** (`(Context % * 0.5) + Turns + (Consecutive Errors * 10)`).
 - **< 30% (🟢 Optimal)**: Continue execution.
-- **30% - 65% (🟡 High Load)**: Prepare to wrap up. Call `smart_save()`.
-- **> 65% (🟠🔴 Critical)**: **STOP WORK** → Update Dashboard → Handoff → Reset session.
+- **30% - 65% (🟡 High Load)**: Prepare to wrap up.
+- **> 65% (🟠🔴 Critical)**: **STOP WORK** → Handoff → Reset session.
 
-### Update Triggers (MANDATORY)
-
-Update your row in `DASHBOARD.md` Active Team table at these moments:
-
-| When | State | Stress Action |
-|------|-------|---------------|
-| Task Start | 🔵 Active | Set baseline (~20) |
-| Task Complete | 🟢 Ready | Reset to ~10, write summary in Notes |
-| Error/Blocked | 🟠 Blocked | +15 per failure, note the blocker |
-| Long session (many turns) | — | +10 periodic |
-| Stress > 65% | 🔴 Critical | **STOP** → write `handover.md` → request session reset |
 ## 6. Git Workflow
 
 - Every implementation task **must** start from an updated base branch: `git pull --ff-only`.
 - **Use one task = one branch.**
 - Default branch naming:
-  - `codex/<task-id>-<short-slug>`
-  - Example: `codex/task-123-fix-auth`
-- **Do not** mark a task `done` in Hub until the task changes are committed.
-- Run relevant tests before commit and before Hub completion.
-- If a remote exists or review is expected, push the branch and open a PR before final handoff.
+  - `codex/<task-id>-<slug>`
+  - Example: `codex/TASK-001-fix-auth`
+- Run relevant tests before commit and before marking the task as complete in the orchestrator.
+- Always push the branch and open a PR before final completion of major features.
 - **Do not** mix unrelated tasks on the same branch.
 - Full procedure: `GIT_WORKFLOW.md`

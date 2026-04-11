@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Prompt Builder - MyAgentSkills</title>
+
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Styling -->
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(16px);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        pre::-webkit-scrollbar {
+            height: 4px;
+            width: 4px;
+        }
+
+        pre::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .error-ring {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+
+<body class="h-screen flex">
+    <div id="app" class="flex w-full h-full">
+
+        <!-- Sidebar -->
+        <aside class="w-80 glass-panel flex flex-col border-r border-white/5 shrink-0 z-20">
+            <div class="p-6 border-b border-white/5">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg"><i
+                            class="fa-solid fa-bolt text-white"></i></div>
+                    <div class="leading-tight">
+                        <h1 class="font-bold text-white tracking-tight">Prompt Builder</h1>
+                        <p class="text-[10px] text-indigo-400 font-bold uppercase">v2 Production</p>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <i
+                        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400"></i>
+                    <input type="text" v-model="searchQuery" placeholder="Search templates, tags, use cases..."
+                        class="w-full bg-slate-900 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
+                <div v-for="cat in categories" :key="cat">
+                    <template v-if="filteredTemplates(cat).length > 0">
+                        <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[2px] mb-3 px-2">{{cat}}</h3>
+                        <ul class="space-y-1">
+                            <li v-for="tpl in filteredTemplates(cat)" :key="tpl.id">
+                                <button @click="selectTemplate(tpl)"
+                                    :class="['w-full text-left px-3 py-2 rounded-lg text-sm transition-all', 
+                                            selected?.id === tpl.id ? 'bg-indigo-600/20 text-indigo-400 font-semibold border border-indigo-500/30' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200']">
+                                    {{tpl.title}}
+                                </button>
+                            </li>
+                        </ul>
+                    </template>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Form -->
+        <main class="flex-1 flex flex-col bg-[#0b1121] overflow-hidden">
+            <Transition name="fade" mode="out-in">
+                <div v-if="!selected" class="flex-1 flex flex-col items-center justify-center text-gray-500 opacity-50">
+                    <i class="fa-solid fa-terminal text-6xl mb-4"></i>
+                    <p class="text-lg">Select a template to build your session prompt</p>
+                </div>
+
+                <div v-else class="h-full flex flex-col" :key="selected.id">
+                    <header class="p-8 border-b border-white/5">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span
+                                class="text-[10px] font-bold bg-indigo-500/10 text-indigo-400 py-0.5 px-2 rounded">{{selected.category}}</span>
+                            <div class="flex space-x-1">
+                                <span v-for="tag in selected.tags" :key="tag"
+                                    class="text-[10px] text-gray-500 border border-white/10 px-1.5 rounded">#{{tag}}</span>
+                            </div>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mb-2">{{selected.title}}</h2>
+                        <p class="text-sm text-gray-400 max-w-2xl">{{selected.description}}</p>
+
+                        <div class="mt-6 flex space-x-4">
+                            <div v-if="selected.use_when"
+                                class="flex-1 bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-lg">
+                                <span class="text-[10px] font-bold text-emerald-500 uppercase block mb-1">Use
+                                    When</span>
+                                <ul class="text-[11px] text-gray-400 list-disc ml-4">
+                                    <li v-for="u in selected.use_when">{{u}}</li>
+                                </ul>
+                            </div>
+                            <div v-if="selected.avoid_when"
+                                class="flex-1 bg-rose-500/5 border border-rose-500/10 p-3 rounded-lg">
+                                <span class="text-[10px] font-bold text-rose-500 uppercase block mb-1">Avoid When</span>
+                                <ul class="text-[11px] text-gray-400 list-disc ml-4">
+                                    <li v-for="a in selected.avoid_when">{{a}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
+                        <div v-for="field in selected.fields" :key="field.id" class="max-w-2xl">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                                {{field.label}} <span v-if="field.required" class="text-rose-500">*</span>
+                            </label>
+
+                            <!-- Input Types -->
+                            <div v-if="field.type === 'textarea'">
+                                <textarea v-model="form[field.id]" :placeholder="field.placeholder" rows="3"
+                                    :class="['w-full bg-slate-900 border border-white/10 rounded-lg p-3 text-sm focus:border-indigo-500 outline-none transition-all', errors[field.id] ? 'error-ring' : '']"></textarea>
+                            </div>
+                            <div v-else-if="field.type === 'select'">
+                                <select v-model="form[field.id]"
+                                    :class="['w-full bg-slate-900 border border-white/10 rounded-lg p-3 text-sm focus:border-indigo-500 outline-none transition-all', errors[field.id] ? 'error-ring' : '']">
+                                    <option v-for="opt in field.options" :key="opt" :value="opt">{{opt}}</option>
+                                </select>
+                            </div>
+                            <div v-else-if="field.type === 'list'">
+                                <div class="flex space-x-2 mb-2">
+                                    <input type="text" v-model="tempInput[field.id]" @keyup.enter="addToList(field.id)"
+                                        :placeholder="field.placeholder || 'Type and press Enter'"
+                                        :class="['flex-1 bg-slate-900 border border-white/10 rounded-lg p-2 text-sm focus:border-indigo-500 outline-none transition-all', errors[field.id] ? 'error-ring' : '']">
+                                    <button @click="addToList(field.id)"
+                                        class="px-4 bg-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-colors">Add</button>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span v-for="(item, idx) in listData[field.id]" :key="idx"
+                                        class="bg-slate-800 text-[10px] px-2 py-1 rounded-md flex items-center border border-white/5">
+                                        {{item}} <i @click="removeFromList(field.id, idx)"
+                                            class="fa-solid fa-times ml-2 cursor-pointer text-gray-500 hover:text-rose-400"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div v-else-if="field.type === 'checkbox'">
+                                <label class="flex items-center space-x-3 cursor-pointer group">
+                                    <input type="checkbox" v-model="form[field.id]"
+                                        class="w-4 h-4 bg-slate-900 checked:bg-indigo-500 border-white/10 rounded transition-all">
+                                    <span
+                                        class="text-sm text-gray-400 group-hover:text-gray-200 transition-colors font-medium">{{field.label}}
+                                        enabled</span>
+                                </label>
+                            </div>
+                            <div v-else>
+                                <input type="text" v-model="form[field.id]" :placeholder="field.placeholder"
+                                    :class="['w-full bg-slate-900 border border-white/10 rounded-lg p-3 text-sm focus:border-indigo-500 outline-none transition-all', errors[field.id] ? 'error-ring' : '']">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+        </main>
+
+        <!-- Preview -->
+        <aside class="w-[500px] bg-[#0f172a] border-l border-white/5 flex flex-col shrink-0">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Real-time Prompt</span>
+                <button v-if="selected" @click="copy"
+                    :class="['px-4 py-2 rounded-lg text-xs font-black transition-all flex items-center', 
+                            Object.keys(errors).length > 0 ? 'shake bg-rose-600 text-white' : (copied ? 'bg-emerald-500 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20')]">
+                    <i v-if="Object.keys(errors).length > 0" class="fa-solid fa-triangle-exclamation mr-2"></i>
+                    {{Object.keys(errors).length > 0 ? 'MISSING FIELDS' : (copied ? 'COPIED!' : 'COPY CLEAN PROMPT')}}
+                </button>
+            </div>
+            <div class="flex-1 p-8 overflow-y-auto bg-slate-950 font-mono text-xs leading-relaxed text-indigo-100/70">
+                <div v-if="selected" class="whitespace-pre-wrap">{{generated}}</div>
+                <div v-else class="h-full flex items-center justify-center text-gray-700 italic">Generate your sequence
+                    here...</div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Data Registry Entry Points -->
+    <script src="data.js"></script>
+    <!-- Individual Domain Scripts (Must load AFTER data.js) -->
+    <script src="templates/understand.js"></script>
+    <script src="templates/debug.js"></script>
+    <script src="templates/review.js"></script>
+    <script src="templates/design.js"></script>
+    <script src="templates/incident.js"></script>
+    <script src="templates/test.js"></script>
+    <script src="templates/refactor.js"></script>
+    <script src="templates/handoff.js"></script>
+
+    <script>
+        const { createApp, ref, computed, watch, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                const templates = ref(window.promptTemplates || []);
+                const categories = ['Understand', 'Debug', 'Review', 'Refactor', 'Design', 'Test', 'Handoff', 'Incident'];
+                const searchQuery = ref('');
+                const selected = ref(null);
+                const form = ref({});
+                const listData = ref({});
+                const tempInput = ref({});
+                const copied = ref(false);
+                const errors = ref({});
+
+                const filteredTemplates = (cat) => {
+                    const q = searchQuery.value.toLowerCase();
+                    return templates.value.filter(t => {
+                        if (t.category !== cat) return false;
+                        if (!q) return true;
+
+                        const inTitle = t.title.toLowerCase().includes(q);
+                        const inTags = t.tags?.some(tag => tag.toLowerCase().includes(q));
+                        const inUse = t.use_when?.some(u => u.toLowerCase().includes(q));
+                        const inDesc = t.description.toLowerCase().includes(q);
+                        const inFields = t.fields?.some(f => f.label.toLowerCase().includes(q));
+                        return inTitle || inTags || inUse || inDesc || inFields;
+                    });
+                };
+
+                const selectTemplate = (tpl) => {
+                    selected.value = tpl;
+                    form.value = {};
+                    listData.value = {};
+                    tempInput.value = {};
+                    errors.value = {};
+
+                    tpl.fields?.forEach(f => {
+                        if (f.type === 'list') listData.value[f.id] = [];
+                        if (f.default !== undefined) form.value[f.id] = f.default;
+                    });
+                };
+
+                const addToList = (id) => {
+                    const val = tempInput.value[id];
+                    if (val) {
+                        listData.value[id].push(val);
+                        tempInput.value[id] = '';
+                        errors.value[id] = false;
+                    }
+                };
+
+                const removeFromList = (id, idx) => {
+                    listData.value[id].splice(idx, 1);
+                };
+
+                const generated = computed(() => {
+                    if (!selected.value) return '';
+                    let tempTemplate = selected.value.template;
+
+                    // First pass: resolve values
+                    const values = {};
+                    selected.value.fields?.forEach(f => {
+                        let value = form.value[f.id];
+                        if (f.type === 'list') {
+                            const items = listData.value[f.id] || [];
+                            value = items.length > 0 ? items.map(i => `- ${i}`).join('\n') : '';
+                        }
+                        values[f.id] = (value === undefined || (typeof value === 'string' && value.trim() === '')) ? null : value;
+                    });
+
+                    // Second pass: line-by-line processing for cleanup
+                    const lines = tempTemplate.split('\n');
+                    const processedLines = lines.filter(line => {
+                        // Find if this line contains a placeholder that is currently empty/null
+                        const placeholders = line.match(/{{(\w+)}}/g);
+                        if (!placeholders) return true;
+
+                        // Check if ALL placeholders in this line are empty
+                        const allEmpty = placeholders.every(p => {
+                            const key = p.slice(2, -2);
+                            return values[key] === null;
+                        });
+
+                        if (allEmpty) {
+                            // Logic: If the line contains other non-whitespace characters besides the placeholder and typical label chars (-, :, *), 
+                            // but no actual content was filled, we likely want to remove the whole label line.
+
+                            // Remove placeholder from line to see what's left
+                            let remaining = line;
+                            placeholders.forEach(p => remaining = remaining.replace(p, ''));
+
+                            // If what's left is just labels or formatting, discard the line
+                            const cleanedRemaining = remaining.replace(/[\\s\-:*]*/g, '').trim();
+                            if (cleanedRemaining === '') return false;
+                        }
+
+                        return true;
+                    }).map(line => {
+                        // Final replacement
+                        let newLine = line;
+                        const linePlaceholders = line.match(/{{(\w+)}}/g);
+                        linePlaceholders?.forEach(p => {
+                            const key = p.slice(2, -2);
+                            newLine = newLine.replace(p, values[key] || '');
+                        });
+                        return newLine;
+                    });
+
+                    // post-processing: remove redundant blank lines
+                    let result = processedLines.join('\n');
+                    // Collapse triple newlines to double newlines
+                    result = result.replace(/\n\n\n+/g, '\n\n');
+                    return result.trim();
+                });
+
+                const validate = () => {
+                    const missing = [];
+                    errors.value = {};
+                    selected.value.fields?.forEach(f => {
+                        if (f.required) {
+                            const val = form.value[f.id];
+                            const isListEmpty = f.type === 'list' && (!listData.value[f.id] || listData.value[f.id].length === 0);
+                            const isTextEmpty = f.type !== 'list' && (!val || (typeof val === 'string' && val.trim() === ''));
+
+                            if (isListEmpty || isTextEmpty) {
+                                errors.value[f.id] = true;
+                                missing.push(f.label);
+                            }
+                        }
+                    });
+                    return missing.length === 0;
+                };
+
+                const copy = async () => {
+                    if (!validate()) {
+                        // Shake effect or feedback
+                        return;
+                    }
+
+                    try {
+                        const content = generated.value;
+                        if (navigator.clipboard) {
+                            await navigator.clipboard.writeText(content);
+                        } else {
+                            const el = document.createElement('textarea');
+                            el.value = content;
+                            document.body.appendChild(el);
+                            el.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(el);
+                        }
+                        copied.value = true;
+                        setTimeout(() => copied.value = false, 2000);
+                    } catch (e) { }
+                };
+
+                return {
+                    categories, templates, searchQuery, selected, form, listData, tempInput, errors,
+                    filteredTemplates, selectTemplate, addToList, removeFromList, generated, copy, copied
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
