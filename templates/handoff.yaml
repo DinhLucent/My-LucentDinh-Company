@@ -1,0 +1,24 @@
+# Handoff Template v2
+# Machine-readable YAML format (replaces markdown handoff-template)
+# Created by: control_plane/hooks/on_handoff.py
+
+task_id: TASK-xxx
+from_role: ""        # sending agent role
+to_role: ""          # receiving agent role
+created_at: ""       # ISO format
+
+completed:
+  - "What was done — specific"
+
+needs_continuation:
+  - "What the next agent must do — specific"
+
+related_files:
+  - # path/to/changed/file
+
+context:
+  decisions: []      # Key decisions made
+  trade_offs: []     # Trade-offs considered
+  warnings: []       # Known risks or gotchas
+
+known_issues: []

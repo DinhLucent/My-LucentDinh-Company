@@ -1,0 +1,111 @@
+"""Task Classifier — Classifies tasks by type, domain, and risk level.
+
+Uses rule-based heuristics on task title/description/domain to produce
+a classification dict consumed by the router and retriever.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+
+# Keywords that signal specific task types
+_TYPE_KEYWORDS: dict[str, list[str]] = {
+    "bugfix": ["fix", "bug", "error", "crash", "broken", "regression", "hotfix"],
+    "refactor": ["refactor", "cleanup", "restructure", "simplify", "reorganize"],
+    "test": ["test", "coverage", "spec", "e2e", "unit test"],
+    "documentation": ["document", "docs", "readme", "changelog", "wiki"],
+    "security": ["security", "vulnerability", "cve", "pen test", "audit"],
+    "feature": ["add", "implement", "create", "build", "new", "feature"],
+}
+
+# Keywords that raise risk level
+_HIGH_RISK_KEYWORDS: list[str] = [
+    "payment", "security", "auth", "prod", "critical", "token",
+    "credential", "database migration", "breaking change", "deploy",
+]
+
+# Keywords that map to domains
+_DOMAIN_KEYWORDS: dict[str, list[str]] = {
+    "auth": ["auth", "login", "logout", "token", "session", "permission", "rbac"],
+    "api": ["api", "endpoint", "rest", "graphql", "route"],
+    "database": ["database", "migration", "schema", "model", "orm", "query"],
+    "frontend": ["ui", "component", "page", "css", "layout", "react", "vue"],
+    "infra": ["deploy", "docker", "ci", "cd", "pipeline", "k8s", "terraform"],
+}
+
+
+class TaskClassifier:
+    """Classify a task dict into type, domain, and risk metadata."""
+
+    def __init__(self, knowledge_dir: Path) -> None:
+        self.knowledge_dir = knowledge_dir
+
+    def classify(self, task: dict[str, Any]) -> dict[str, Any]:
+        title = (task.get("title") or "").lower()
+        description = (task.get("description") or "").lower()
+        text = f"{title}\n{description}"
+
+        task_type = self._detect_type(text)
+        domain = self._detect_domain(text, task.get("domain", "general"))
+        risk_level = self._detect_risk(text, task_type)
+
+        return {
+            "task_type": task_type,
+            "domain": domain,
+            "risk_level": risk_level,
+            "requires_parallel_review": risk_level == "high",
+            "likely_roles": self._likely_roles(task_type, domain),
+            "required_tools": self._required_tools(task_type),
+            "likely_artifacts": self._likely_artifacts(task_type),
+        }
+
+    # ── Private helpers ──────────────────────────────────────
+
+    def _detect_type(self, text: str) -> str:
+        for task_type, keywords in _TYPE_KEYWORDS.items():
+            if any(kw in text for kw in keywords):
+                return task_type
+        return "feature"
+
+    def _detect_domain(self, text: str, explicit: str) -> str:
+        if explicit != "general":
+            return explicit
+        for domain, keywords in _DOMAIN_KEYWORDS.items():
+            if any(kw in text for kw in keywords):
+                return domain
+        return "general"
+
+    def _detect_risk(self, text: str, task_type: str) -> str:
+        if task_type == "security":
+            return "high"
+        if any(kw in text for kw in _HIGH_RISK_KEYWORDS):
+            return "high"
+        if task_type in ("refactor", "feature"):
+            return "medium"
+        return "low"
+
+    def _likely_roles(self, task_type: str, domain: str) -> list[str]:
+        roles: list[str] = []
+        if task_type in ("bugfix", "feature", "refactor"):
+            roles.append("backend" if domain != "frontend" else "frontend")
+        elif task_type == "test":
+            roles.append("qa")
+        elif task_type == "documentation":
+            roles.append("docs")
+        elif task_type == "security":
+            roles.extend(["security", "backend"])
+        return roles or ["backend"]
+
+    def _required_tools(self, task_type: str) -> list[str]:
+        base = ["knowledge_retriever"]
+        if task_type in ("bugfix", "feature", "refactor"):
+            base.extend(["code_retriever", "test_runner", "lint_runner"])
+        elif task_type == "test":
+            base.append("test_runner")
+        elif task_type == "security":
+            base.extend(["security_checker", "code_retriever"])
+        return base
+
+    def _likely_artifacts(self, task_type: str) -> list[str]:
+        return ["task_packet", "verification_report"]

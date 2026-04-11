@@ -1,0 +1,53 @@
+{
+  "task_id": "TASK-2026-001",
+  "session_id": "SESSION-2026-04-11-001",
+  "role": "backend",
+  "secondary_roles": [],
+  "mode": "solo",
+  "task_type": "bugfix",
+  "domain": "auth",
+  "risk_level": "medium",
+  "goal": "Fix refresh token loop on login flow",
+  "summary": "Refresh token rotation causes unintended logout timing.",
+  "rules": [
+    "Do not change public API contract",
+    "Prefer minimal patch",
+    "Update handoff after execution"
+  ],
+  "context_budget": {
+    "max_input_tokens": 12000,
+    "max_code_tokens": 8000,
+    "max_memory_tokens": 1500
+  },
+  "context_fragments": [
+    {
+      "id": "auth_module_summary",
+      "type": "module_summary",
+      "path": "knowledge/compiled/context_fragments/auth.summary.json"
+    }
+  ],
+  "files": [
+    "src/auth/login.py",
+    "src/auth/token_service.py"
+  ],
+  "tests": [
+    "tests/auth/test_refresh.py"
+  ],
+  "handoff_refs": [],
+  "memory_refs": [],
+  "verification_plan": [
+    "lint changed files",
+    "typecheck auth module",
+    "pytest tests/auth/test_refresh.py"
+  ],
+  "expected_outputs": [
+    "patch",
+    "change_summary",
+    "handoff_update"
+  ],
+  "acceptance_criteria": [
+    "refresh token rotation works",
+    "login flow remains unchanged",
+    "auth tests pass"
+  ]
+}

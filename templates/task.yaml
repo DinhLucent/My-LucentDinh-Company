@@ -1,0 +1,34 @@
+# Enhanced Task Template v2
+# Use with: control_plane/orchestrator.py
+# The orchestrator reads this format and generates task_packet.json
+
+id: TASK-2026-001
+title: Fix refresh token loop on login flow
+description: >
+  User bị logout sai thời điểm khi refresh token rotation xảy ra.
+assigned_role: backend
+priority: high
+status: queued
+domain: auth
+
+inputs:
+  related_paths:
+    - src/auth/login.py
+    - src/auth/token_service.py
+  related_tests:
+    - tests/auth/test_refresh.py
+  related_handoffs: []
+  related_logs: []
+
+constraints:
+  - do_not_change_api_contract
+  - keep_cookie_strategy
+
+acceptance_criteria:
+  - refresh token rotation works
+  - login flow remains unchanged
+  - auth tests pass
+
+metadata:
+  created_by: CEO
+  created_at: "2026-04-11T10:00:00Z"
