@@ -50,12 +50,12 @@ Use this after:
 - small hook changes
 - low-risk packet formatting changes
 
-Run:
+Run serially:
 
 ```bash
 python run_orchestrator.py compile
 python run_orchestrator.py plan templates/task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-cli-task.yaml
+python run_orchestrator.py run tests/fixtures/audit/happy_path.yaml
 ```
 
 Check:
@@ -77,14 +77,13 @@ Use this after:
 - executor changes
 - state machine changes
 
-Run:
+Run serially:
 
 ```bash
 python run_orchestrator.py compile
-python run_orchestrator.py run runtime/sessions/phase3-cli-task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-happy-task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-fail-task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-hard-fail-task.yaml
+python run_orchestrator.py run tests/fixtures/audit/happy_path.yaml
+python run_orchestrator.py run tests/fixtures/audit/retry_scenario.yaml
+python run_orchestrator.py run tests/fixtures/audit/hard_fail.yaml
 ```
 
 Check:
@@ -114,16 +113,15 @@ Run:
 3. Re-run the runtime regression suite.
 4. Inspect compiled and runtime outputs for stale artifacts.
 
-Suggested sequence:
+Suggested serial sequence:
 
 ```bash
 make clean
 python run_orchestrator.py compile
 python run_orchestrator.py plan templates/task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-cli-task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-happy-task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-fail-task.yaml
-python run_orchestrator.py run runtime/sessions/phase3-hard-fail-task.yaml
+python run_orchestrator.py run tests/fixtures/audit/happy_path.yaml
+python run_orchestrator.py run tests/fixtures/audit/retry_scenario.yaml
+python run_orchestrator.py run tests/fixtures/audit/hard_fail.yaml
 ```
 
 Check:
