@@ -74,9 +74,9 @@ def build_handoff_index(repo_root: Path, out_dir: Path) -> Path:
                 continue
             handoffs.append({
                 "task_id": payload.get("task_id", ""),
-                "from_role": payload.get("from_role", ""),
-                "to_role": payload.get("to_role", ""),
-                "reason": payload.get("reason", ""),
+                "from_role": payload.get("from_role") or payload.get("from", ""),
+                "to_role": payload.get("to_role") or payload.get("to", ""),
+                "reason": payload.get("reason") or payload.get("context", ""),
                 "path": str(f.relative_to(repo_root)),
                 "created_at": payload.get("created_at", ""),
             })

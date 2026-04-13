@@ -164,6 +164,16 @@ class Orchestrator:
             execution_results.append(execution_result)
             self.metrics_logger.record_execution(task_id, execution_result)
 
+            # Role gate block is deterministic - retrying won't help.
+            # Break immediately and let the failure handoff happen.
+            _is_role_gate_blocked = any(
+                step.get('status') == 'blocked'
+                for step in execution_result.get('step_results', [])
+            )
+            if _is_role_gate_blocked:
+                final_status = 'failed'
+                break
+
             self.task_state_machine.transition(
                 task_id=task_id,
                 status="executed",
