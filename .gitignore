@@ -28,7 +28,10 @@ temp-*/
 tmp/
 dist/
 build/
-refs_github
+# Skill Pool & Reference Repos (local-only, not tracked)
+.skills_pool/
+refs_github/
+
 # Auto-generated agent rules (personalized per developer)
 .brainsync/agent-rules.md
 
@@ -36,7 +39,6 @@ refs_github
 AGENT.md
 CLAUDE.md
 myidea
-refs_githubhọc
 
 # Control Plane - Runtime (ephemeral, not tracked)
 runtime/state/
