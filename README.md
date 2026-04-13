@@ -41,6 +41,8 @@ This README is only the entry map. If another doc repeats the workflow different
 
 ## Quick Start For A Session
 
+If you are completely new, read `GUIDE_FIRSTGUY.md` before opening the first session.
+
 Open a session with a role prompt:
 
 ```text
@@ -149,6 +151,7 @@ python run_orchestrator.py system-test --iterations 1
 | Document | Purpose |
 |---|---|
 | [ONBOARDING.md](ONBOARDING.md) | Boot order for every new role session |
+| [GUIDE_FIRSTGUY.md](GUIDE_FIRSTGUY.md) | First-start guide for zero build, improve repo, and solve issue |
 | [CHEATSHEET.md](CHEATSHEET.md) | Fast operational guide |
 | [PROMPT_PACK.md](PROMPT_PACK.md) | Role-first prompts for zero build, improve repo, and solve issue |
 | [BOOTSTRAP_SHIELD.md](BOOTSTRAP_SHIELD.md) | How to apply SHIELD to another repo |

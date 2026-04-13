@@ -6,10 +6,50 @@ How to apply SHIELD to another repository.
 
 | Mode | Use when | What you copy |
 |---|---|---|
-| Prompt-only | quick exploration, short task, unsure repo | `PROMPT_PACK.md`, `ONBOARDING.md`, `CHEATSHEET.md`, `tools/prompt-builder/` |
-| Full runtime | long-term work, repeated tasks, need reports/handoffs/verification | `control_plane/`, `run_orchestrator.py`, `templates/`, `manifest.yaml`, docs |
+| Prompt-only | quick exploration, short task, unsure repo | `GUIDE_FIRSTGUY.md`, `PROMPT_PACK.md`, `ONBOARDING.md`, `CHEATSHEET.md`, `tools/prompt-builder/` |
+| Full runtime | long-term work, repeated tasks, need reports/handoffs/verification | `control_plane/`, `run_orchestrator.py`, `templates/`, `manifest.yaml`, `DASHBOARD.md`, `GUIDE_FIRSTGUY.md`, `ONBOARDING.md`, `OPERATING_RULES.md`, `CHEATSHEET.md`, `PROMPT_PACK.md`, `ROLE_SKILL_MATRIX.md`, `Skills/` |
 
 If unsure, start Prompt-only.
+
+If this is your first time applying SHIELD to a repo, read `GUIDE_FIRSTGUY.md` first.
+
+## Validation Profiles
+
+Use these add-ons only when you need them.
+
+| Profile | Add these files | What it unlocks |
+|---|---|---|
+| Runtime core | already covered by `Full runtime` | `compile`, `plan`, `run`, `dashboard` |
+| Audit-ready | `tests/fixtures/audit/` and optionally `SYSTEM_AUDIT.md` | `python run_orchestrator.py audit` |
+| Prompt-sandbox-ready | `tools/prompt-builder/` | `python run_orchestrator.py prompt-sandbox` |
+
+## Fast Path: Add SHIELD In 10 Steps
+
+Use this when you want the simplest practical path for a new external repo.
+
+1. Clone the target repo and make sure you can run it or at least identify the current failure clearly.
+2. Decide whether you need `Prompt-only` or `Full runtime`.
+3. Copy the required SHIELD files into the target repo root.
+4. Add the SHIELD `.gitignore` rules for `runtime/`, `.hub/`, and `knowledge/compiled/`.
+5. Read `GUIDE_FIRSTGUY.md` and choose one scenario: `zero build`, `improve existing repo`, or `solve issue`.
+6. Trim `manifest.yaml` to only the roles you plan to use in that repo.
+7. Run:
+
+```bash
+python run_orchestrator.py compile
+```
+
+8. Open the first leadership session: `product-manager-agent` for zero build or improvement, or `qa-lead-agent` for unclear issue triage.
+9. Create one small approved task, then run:
+
+```bash
+python run_orchestrator.py plan path/to/task.yaml
+python run_orchestrator.py run path/to/task.yaml
+```
+
+10. Read the outputs before opening more sessions: `DASHBOARD.md`, `.hub/done/`, `runtime/reports/session_reports/`, and `runtime/reports/quick_reports/`.
+
+If the repo should support self-checking of SHIELD itself, also copy the audit fixtures and prompt-builder assets, then run `audit` and `prompt-sandbox`.
 
 ## Recommended First Step
 
@@ -55,17 +95,25 @@ Required:
 - `run_orchestrator.py`
 - `templates/`
 - `manifest.yaml`
+- `DASHBOARD.md`
+- `GUIDE_FIRSTGUY.md`
 - `ONBOARDING.md`
 - `OPERATING_RULES.md`
 - `CHEATSHEET.md`
 - `PROMPT_PACK.md`
+- `ROLE_SKILL_MATRIX.md`
+- `Skills/`
 
 Recommended:
 
 - `CTO_PRODUCT_WORKFLOW.md`
 - `SYSTEM_AUDIT.md`
 - `tools/prompt-builder/`
-- `Skills/`
+
+Add these when you need stronger validation:
+
+- for `audit`: `tests/fixtures/audit/`
+- for `prompt-sandbox`: `tools/prompt-builder/`
 
 Do not copy by default:
 
@@ -106,24 +154,26 @@ Install the target repo's own dependencies separately.
 ## Bootstrap Checklist
 
 1. Confirm target repo builds or at least has a known failure.
-2. Create or copy `DASHBOARD.md`.
-3. Trim `manifest.yaml` to the roles you will actually use.
-4. Run:
+2. Read `GUIDE_FIRSTGUY.md` and choose the correct scenario.
+3. Create or copy `DASHBOARD.md`.
+4. Trim `manifest.yaml` to the roles you will actually use.
+5. Run:
 
 ```bash
 python run_orchestrator.py compile
 ```
 
-5. Create a small `leadership_brief`.
-6. Convert one approved task into `task.yaml`.
-7. Run:
+6. Open Product or QA first based on the chosen scenario.
+7. Create a small `leadership_brief` or triage summary.
+8. Convert one approved task into `task.yaml`.
+9. Run:
 
 ```bash
 python run_orchestrator.py plan path/to/task.yaml
 python run_orchestrator.py run path/to/task.yaml
 ```
 
-Then run the serial audit once:
+If you copied `ROLE_SKILL_MATRIX.md`, `Skills/`, and `tests/fixtures/audit/`, run the serial audit once:
 
 ```bash
 python run_orchestrator.py audit
