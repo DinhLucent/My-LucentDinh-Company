@@ -4,8 +4,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +19,8 @@ class AgentExecutor:
         self.repo_root = repo_root
         self.run_dir = runtime_dir / "state" / "agent_runs"
         self.run_dir.mkdir(parents=True, exist_ok=True)
+        self.audit_log_path = runtime_dir / "reports" / "command_audit.jsonl"
+        self.audit_log_path.parent.mkdir(parents=True, exist_ok=True)
 
     def execute(
         self,
@@ -160,6 +164,7 @@ class AgentExecutor:
             step_name="primary_execute",
             role=packet.get("role", task.get("assigned_role", "backend")),
             commands=commands,
+            execution_config=execution_config,
             cwd=execution_config.get("cwd"),
             env=execution_config.get("env", {}),
             task_id=task["id"],
@@ -182,6 +187,7 @@ class AgentExecutor:
                 step_name=step_name,
                 role=step["role"],
                 commands=commands,
+                execution_config=execution_config,
                 cwd=execution_config.get("cwd"),
                 env=execution_config.get("env", {}),
                 task_id=packet["task_id"],
@@ -200,6 +206,7 @@ class AgentExecutor:
         step_name: str,
         role: str,
         commands: list[str],
+        execution_config: dict[str, Any],
         cwd: str | None,
         env: dict[str, str],
         task_id: str,
@@ -211,15 +218,73 @@ class AgentExecutor:
         combined_details: list[str] = []
         stdout_tail = ""
         stderr_tail = ""
+        resolved_cwd = self._resolve_cwd(cwd)
+        timeout_seconds = self._timeout_for_step(step_name, attempt, execution_config)
+
+        blocked, reason = self._blocked_by_workspace(resolved_cwd)
+        if blocked:
+            details = f"Security policy blocked command: {reason}"
+            self._record_command_audit(
+                task_id=task_id,
+                attempt=attempt,
+                step_name=step_name,
+                command="; ".join(commands),
+                cwd=resolved_cwd,
+                status="blocked",
+                reason=reason,
+            )
+            return {
+                "name": step_name,
+                "role": role,
+                "result": "failed",
+                "status": "blocked",
+                "details": details,
+                "commands": [{
+                    "command": "; ".join(commands),
+                    "returncode": None,
+                    "stdout_tail": "",
+                    "stderr_tail": details,
+                    "duration_seconds": 0.0,
+                    "blocked": True,
+                    "block_reason": reason,
+                }],
+                "stdout_tail": "",
+                "stderr_tail": details,
+            }
 
         for command in commands:
+            blocked, reason = self._blocked_command(command, resolved_cwd)
+            if blocked:
+                details = f"Security policy blocked command: {reason}"
+                self._record_command_audit(
+                    task_id=task_id,
+                    attempt=attempt,
+                    step_name=step_name,
+                    command=command,
+                    cwd=resolved_cwd,
+                    status="blocked",
+                    reason=reason,
+                )
+                command_results.append({
+                    "command": command,
+                    "returncode": None,
+                    "stdout_tail": "",
+                    "stderr_tail": details,
+                    "duration_seconds": 0.0,
+                    "blocked": True,
+                    "block_reason": reason,
+                })
+                step_status = "blocked"
+                stderr_tail = details
+                combined_details.append(details)
+                break
             started_at = time.time()
             proc = subprocess.run(
                 self._shell_command(command),
-                cwd=str(self._resolve_cwd(cwd)),
+                cwd=str(resolved_cwd),
                 capture_output=True,
                 text=True,
-                timeout=180,
+                timeout=timeout_seconds,
                 env=self._command_env(env, task_id, attempt, packet_path),
             )
             stdout_tail = (proc.stdout or "")[-1200:]
@@ -231,6 +296,15 @@ class AgentExecutor:
                 "stderr_tail": stderr_tail,
                 "duration_seconds": round(time.time() - started_at, 3),
             })
+            self._record_command_audit(
+                task_id=task_id,
+                attempt=attempt,
+                step_name=step_name,
+                command=command,
+                cwd=resolved_cwd,
+                status="completed" if proc.returncode == 0 else "failed",
+                reason=stderr_tail if proc.returncode != 0 else "",
+            )
             if stdout_tail:
                 combined_details.append(stdout_tail)
             if stderr_tail:
@@ -242,8 +316,8 @@ class AgentExecutor:
         return {
             "name": step_name,
             "role": role,
-            "result": step_status,
-            "status": "completed" if step_status == "passed" else "failed",
+            "result": "failed" if step_status in {"failed", "blocked"} else "passed",
+            "status": "blocked" if step_status == "blocked" else ("completed" if step_status == "passed" else "failed"),
             "details": "\n".join(detail for detail in combined_details if detail).strip(),
             "commands": command_results,
             "stdout_tail": stdout_tail,
@@ -312,6 +386,10 @@ class AgentExecutor:
             "output_files": self._normalize_paths(output_files),
             "changed_files": self._normalize_paths(changed_files),
             "satisfied_criteria": self._string_list(satisfied_criteria),
+            "timeout_seconds": int(execution.get("timeout_seconds", 180)),
+            "retry_timeout_seconds": int(execution.get("retry_timeout_seconds", 60)),
+            "review_timeout_seconds": int(execution.get("review_timeout_seconds", 60)),
+            "parallel_timeout_seconds": int(execution.get("parallel_timeout_seconds", 90)),
         }
 
     def _commands_for_step(self, step_name: str, execution_config: dict[str, Any]) -> list[str]:
@@ -395,6 +473,20 @@ class AgentExecutor:
             return candidate
         return (self.repo_root / candidate).resolve()
 
+    def _timeout_for_step(
+        self,
+        step_name: str,
+        attempt: int,
+        execution_config: dict[str, Any],
+    ) -> int:
+        if attempt > 1:
+            return int(execution_config.get("retry_timeout_seconds", 60))
+        if step_name == "secondary_review":
+            return int(execution_config.get("review_timeout_seconds", 60))
+        if step_name.startswith("parallel_"):
+            return int(execution_config.get("parallel_timeout_seconds", 90))
+        return int(execution_config.get("timeout_seconds", 180))
+
     def _command_env(
         self,
         extra_env: dict[str, str],
@@ -408,6 +500,10 @@ class AgentExecutor:
         env["AGENT_TASK_ATTEMPT"] = str(attempt)
         if packet_path:
             env["AGENT_TASK_PACKET_PATH"] = packet_path
+        env.setdefault("AGENT_TIMEOUT_SECONDS", "180")
+        env.setdefault("AGENT_RETRY_TIMEOUT_SECONDS", "60")
+        env.setdefault("AGENT_REVIEW_TIMEOUT_SECONDS", "60")
+        env.setdefault("AGENT_PARALLEL_TIMEOUT_SECONDS", "90")
         return env
 
     def _shell_command(self, command: str) -> list[str]:
@@ -430,3 +526,78 @@ class AgentExecutor:
         if not isinstance(values, list):
             return []
         return [str(value) for value in values if str(value).strip()]
+
+    def _blocked_by_workspace(self, cwd: Path) -> tuple[bool, str]:
+        try:
+            cwd.resolve().relative_to(self.repo_root.resolve())
+        except ValueError:
+            return True, f"Workspace boundary blocked command: cwd {cwd} is outside repo_root"
+        return False, ""
+
+    def _blocked_command(self, command: str, cwd: Path) -> tuple[bool, str]:
+        blocked, reason = self._blocked_by_workspace(cwd)
+        if blocked:
+            return True, reason
+
+        lowered = command.strip()
+        danger_patterns = [
+            (r"(?i)\brm\s+-rf\s+/", "Dangerous recursive delete"),
+            (r"(?i)\brm\s+-rf\s+\*", "Dangerous recursive delete"),
+            (r"(?i)\bdel\s+/s\s+/q\s+[a-z]:\\", "Dangerous recursive delete"),
+            (r"(?i)\bremove-item\s+-recurse\s+-force\s+[a-z]:\\", "Dangerous recursive delete"),
+            (r"(?i)\bformat(-volume)?\b", "Disk formatting command"),
+            (r"(?i)\bdiskpart\b", "Disk partitioning command"),
+            (r"(?i)\bmkfs\b", "Filesystem formatting command"),
+            (r"(?i)\bdd\s+if=", "Raw disk write command"),
+            (r"(?i)\bshutdown\b", "System shutdown command"),
+            (r"(?i)\breboot\b", "System reboot command"),
+            (r"(?i)\binvoke-expression\b|\biex\b", "Dangerous shell evaluation"),
+            (r"(?i)\b(curl|wget)\b.+\|\s*(bash|sh|pwsh|powershell)\b", "Remote shell pipe"),
+            (r"(?i)\bgit\s+reset\s+--hard\b", "Destructive git reset"),
+            (r"(?i)\bgit\s+clean\s+-f", "Destructive git clean"),
+        ]
+        for pattern, reason in danger_patterns:
+            if re.search(pattern, lowered):
+                return True, reason
+
+        escape_patterns = [
+            r"(?i)\bcd\s+\.\.",
+            r"(?i)\bset-location\s+\.\.",
+            r"(?i)\bpushd\s+\.\.",
+            r"(?i)\bcd\s+\/",
+        ]
+        for pattern in escape_patterns:
+            if re.search(pattern, lowered):
+                return True, "Workspace boundary blocked command: directory traversal"
+
+        abs_cd = re.search(r"(?i)\b(cd|set-location|pushd)\s+['\"]?([a-z]:\\[^'\"\s]+)", lowered)
+        if abs_cd:
+            target = Path(abs_cd.group(2))
+            try:
+                target.resolve().relative_to(self.repo_root.resolve())
+            except ValueError:
+                return True, f"Workspace boundary blocked command: cd to {target}"
+        return False, ""
+
+    def _record_command_audit(
+        self,
+        task_id: str,
+        attempt: int,
+        step_name: str,
+        command: str,
+        cwd: Path,
+        status: str,
+        reason: str,
+    ) -> None:
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "task_id": task_id,
+            "attempt": attempt,
+            "step_name": step_name,
+            "command": command,
+            "cwd": str(cwd),
+            "status": status,
+            "reason": reason,
+        }
+        with self.audit_log_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")

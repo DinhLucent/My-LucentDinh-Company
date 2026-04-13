@@ -166,12 +166,11 @@ class Orchestrator:
 
             # Role gate block is deterministic - retrying won't help.
             # Break immediately and let the failure handoff happen.
-            _is_role_gate_blocked = any(
-                step.get('status') == 'blocked'
-                for step in execution_result.get('step_results', [])
-            )
-            if _is_role_gate_blocked:
+            if self._role_gate_blocked([execution_result]):
                 final_status = 'failed'
+                break
+            if self._security_policy_blocked([execution_result]):
+                final_status = "failed"
                 break
 
             self.task_state_machine.transition(
@@ -550,6 +549,16 @@ class Orchestrator:
                 ],
                 "recommended_next_step": "Assigned role should claim the task, review the packet, and continue execution.",
             }
+        if self._security_policy_blocked(execution_results):
+            return {
+                "target_role": "security",
+                "reason": "Security policy blocked command execution.",
+                "context": [
+                    "Execution stopped because a command violated the security policy.",
+                    "Review the blocked command and adjust the task or approve a safe alternative.",
+                ],
+                "recommended_next_step": "Security should review the blocked command and decide a safe path forward.",
+            }
 
         target_role = verification_report.get("recommended_next_role") or "reviewer"
         if target_role == execution_mode.get("primary_role"):
@@ -590,6 +599,16 @@ class Orchestrator:
                     continue
                 details = str(step.get("details", ""))
                 if "Role gate blocked execution" in details:
+                    return True
+        return False
+
+    def _security_policy_blocked(self, execution_results: list[dict[str, Any]]) -> bool:
+        for result in execution_results:
+            for step in result.get("step_results", []):
+                if step.get("status") != "blocked":
+                    continue
+                details = str(step.get("details", ""))
+                if "Security policy blocked command" in details:
                     return True
         return False
 

@@ -86,6 +86,8 @@ def cmd_audit(repo_root: Path) -> None:
         ("run", repo_root / "tests" / "fixtures" / "audit" / "retry_scenario.yaml", "completed"),
         ("run", repo_root / "tests" / "fixtures" / "audit" / "hard_fail.yaml", "failed"),
         ("run", repo_root / "tests" / "fixtures" / "audit" / "role_gate_mismatch.yaml", "failed"),
+        ("run", repo_root / "tests" / "fixtures" / "audit" / "security_blocked.yaml", "failed"),
+        ("run", repo_root / "tests" / "fixtures" / "audit" / "workspace_blocked.yaml", "failed"),
     ]
     results = []
     failures = []
@@ -112,6 +114,8 @@ def cmd_audit(repo_root: Path) -> None:
             failures.append("hard_fail.yaml: expected a handoff artifact")
         if task_path.name == "role_gate_mismatch.yaml":
             failures.extend(_validate_role_gate_mismatch(repo_root, task, result, handoff_path))
+        if task_path.name in {"security_blocked.yaml", "workspace_blocked.yaml"}:
+            failures.extend(_validate_security_blocked(repo_root, task, result, handoff_path))
         if handoff_path:
             failures.extend(_validate_handoff_artifact(Path(handoff_path), task_path.name))
         results.append({
@@ -143,6 +147,8 @@ def cmd_audit(repo_root: Path) -> None:
             "retry_path",
             "hard_fail_path",
             "role_gate_mismatch",
+            "security_blocked",
+            "workspace_blocked",
         ],
         "results": results,
     })
@@ -254,6 +260,59 @@ def _validate_role_gate_mismatch(
                 "role_gate_mismatch.yaml: expected handoff to "
                 f"{expected_handoff_to}, got {handoff_payload.get('to_role')}"
             )
+    return failures
+
+
+def _validate_security_blocked(
+    repo_root: Path,
+    task: dict[str, object],
+    result: dict[str, object],
+    handoff_path: str | None,
+) -> list[str]:
+    failures: list[str] = []
+    metadata = task.get("metadata", {})
+    if not isinstance(metadata, dict):
+        metadata = {}
+    for rel_path in metadata.get("expected_no_output_files", []):
+        path = repo_root / str(rel_path)
+        if path.exists():
+            failures.append(f"{task.get('id')}: forbidden output was created: {rel_path}")
+
+    execution_results = result.get("execution_results", [])
+    if not isinstance(execution_results, list) or not execution_results:
+        failures.append(f"{task.get('id')}: missing execution result")
+        return failures
+    first_result = execution_results[0]
+    if not isinstance(first_result, dict):
+        failures.append(f"{task.get('id')}: malformed execution result")
+        return failures
+    step_results = first_result.get("step_results", [])
+    if not isinstance(step_results, list) or not step_results:
+        failures.append(f"{task.get('id')}: missing step result")
+        return failures
+    first_step = step_results[0]
+    if not isinstance(first_step, dict):
+        failures.append(f"{task.get('id')}: malformed step result")
+        return failures
+    if first_step.get("status") != "blocked":
+        failures.append(f"{task.get('id')}: expected blocked step status")
+    details = str(first_step.get("details", ""))
+    if "Security policy blocked command" not in details:
+        failures.append(f"{task.get('id')}: expected security block reason in details")
+
+    retry_results = result.get("retry_results", [])
+    if isinstance(retry_results, list) and retry_results:
+        failures.append(f"{task.get('id')}: security policy block should not create retry packets")
+
+    expected_handoff_to = metadata.get("expected_handoff_to")
+    if expected_handoff_to and handoff_path and Path(handoff_path).exists():
+        handoff_payload = json.loads(Path(handoff_path).read_text(encoding="utf-8"))
+        if handoff_payload.get("to_role") != expected_handoff_to:
+            failures.append(
+                f"{task.get('id')}: expected handoff to {expected_handoff_to}, got {handoff_payload.get('to_role')}"
+            )
+    if expected_handoff_to and not handoff_path:
+        failures.append(f"{task.get('id')}: expected a handoff artifact")
     return failures
 
 

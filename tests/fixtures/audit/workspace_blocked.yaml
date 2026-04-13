@@ -1,0 +1,41 @@
+# Audit Fixture: Workspace Boundary Blocked
+# Scenario: Command tries to escape repo root via directory traversal.
+# Run: python run_orchestrator.py run tests/fixtures/audit/workspace_blocked.yaml
+
+schema_version: "2.1"
+id: AUDIT-WORKSPACE-BLOCK-001
+task_type: feature
+title: "Block workspace boundary traversal"
+description: >
+  Task attempts to change directory outside the repo root. The security
+  policy should block execution before running the command.
+assigned_role: backend
+priority: critical
+status: queued
+domain: general
+
+inputs:
+  related_paths:
+    - runtime/sessions/workspace_blocked.txt
+  related_tests: []
+  related_handoffs: []
+  related_logs: []
+  related_modules: []
+
+constraints:
+  - workspace_boundary_enforced
+
+acceptance_criteria:
+  - security policy blocks execution
+
+metadata:
+  fixture_type: workspace_blocked
+  expected_outcome: blocked_before_execution
+  expected_handoff_to: security
+  expected_no_output_files:
+    - runtime/sessions/workspace_blocked.txt
+  execution:
+    primary_commands:
+      - "Set-Location ..; Set-Content -Path 'runtime/sessions/workspace_blocked.txt' -Value 'SHOULD NOT RUN' -Encoding utf8"
+    output_files:
+      - runtime/sessions/workspace_blocked.txt
