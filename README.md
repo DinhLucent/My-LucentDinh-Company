@@ -90,6 +90,17 @@ python run_orchestrator.py system-test --iterations 1
 
 `system-test` copies SHIELD into a fresh sandbox and runs zero-build, improve, fix-with-retry, and prompt-driven multi-session scenarios end-to-end.
 
+## Sandbox Checks
+
+Run these after security or orchestration changes:
+
+```bash
+python run_orchestrator.py prompt-sandbox
+python run_orchestrator.py system-test --iterations 1 --clean
+```
+
+`prompt-sandbox` validates the multi-session flow. `system-test` validates zero-build, improve, fix/retry, and audit inside a fresh sandbox copy.
+
 ## Core Artifacts
 
 | Artifact | Purpose |
