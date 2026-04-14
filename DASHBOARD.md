@@ -1,98 +1,71 @@
 # DASHBOARD
 
-Quick context for SHIELD sessions.
+CEO quick view for SHIELD.
 
-Keep this file short. Detailed history belongs in reports and handoffs.
+This file is for fast project status only.
 
-## Project Snapshot
+Detailed process lives in `OPERATING_RULES.md`.
+
+## Executive Snapshot
 
 | Key | Value |
 |---|---|
 | Project | Agents-of-SHIELD |
-| Operating model | Product + CTO first, workers by assigned task |
+| Operating model | Product + CTO first, workers execute assigned tasks |
 | Current phase | Collaboration workflow + sandbox validation |
-| Primary workflow | `User -> Product + CTO -> Task -> Worker -> QA/Reviewer -> Dashboard` |
+| System health | Stable for serial runtime, audit, prompt sandbox, and system-test |
 | Last updated | 2026-04-14 |
 
-## Quick Context
+## What Matters Now
 
-- Latest system check: run `python run_orchestrator.py dashboard` for live counts.
-- Current priority: maintain Product/CTO-first workflow with verified execution loops.
-- If unsure: open `STATUS.md` for current backlog and known limits.
+- The control plane is running end-to-end with execute -> verify -> retry.
+- The leadership-first workflow is restored and documented.
+- Sandbox validation is passing, so the main risk is workflow drift, not runtime failure.
 
-## Task Stats (Live)
+## CEO Check
 
-The live counts come from `.hub/` and `runtime/reports/`.
-
-```bash
-python run_orchestrator.py dashboard
-```
-
-Expected fields:
-
-- active tasks
-- blocked tasks
-- recent done
-- recent handoffs
-- recent session reports
-
-## CEO / Operator Check
-
-Use this for the live artifact view:
+Use the live dashboard for the real snapshot:
 
 ```bash
 python run_orchestrator.py dashboard
 ```
 
-Source of truth:
+Look at these fields first:
 
-- `.hub/active/`
-- `.hub/done/`
-- `.hub/handoffs/`
-- `runtime/reports/session_reports/`
-- `runtime/reports/quick_reports/`
-- `runtime/reports/system_tests/`
+- `active_tasks`
+- `blocked_tasks`
+- `recent_done`
+- `recent_handoffs`
+- `recent_system_tests`
+
+## How To Read The Live View
+
+- `active_tasks`: work currently in progress
+- `blocked_tasks`: tasks needing intervention or reassignment
+- `recent_done`: latest completed or terminal tasks
+- `recent_handoffs`: work that changed owner or needs another role
+- `recent_system_tests`: latest proof that SHIELD still works as a system
+
+Note:
+
+- Audit fixtures may appear in recent history.
+- For real project progress, prioritize business task ids and leadership artifacts over audit task ids.
 
 ## Current Focus
 
-- Restore leadership-first intake.
-- Make role sessions start from onboarding and task artifacts.
-- Keep the execution kernel stable.
-- Add collaboration writeback through session reports, handoffs, and decisions.
-- Keep sandbox system tests passing for zero-build, improve, and fix/retry flows.
+- Keep Product/CTO as the intake gate for raw requests.
+- Keep worker sessions scoped to assigned tasks only.
+- Keep reports, handoffs, and dashboard outputs aligned with runtime artifacts.
+- Keep sandbox validation green after every meaningful control-plane change.
 
-## Active Roles
+## At Risk
 
-| Role | Use for |
-|---|---|
-| `product-manager-agent` | problem framing, scope, priority, acceptance |
-| `cto-agent` | architecture, ADR, technical decomposition |
-| `producer-agent` | sprint sequencing and task hygiene |
-| `backend-agent` | backend/API/data tasks |
-| `frontend-agent` | UI/component/page tasks |
-| `fullstack-agent` | cross-layer tasks |
-| `qa-lead-agent` | verification, release confidence, bug triage |
-| `security-agent` | security review and risk escalation |
+- Process drift if sessions skip Product/CTO and jump straight into worker execution.
+- Stale status if docs are updated without re-running validation.
+- Mixed signal in recent history when audit tasks and real project tasks are viewed together.
 
-## Open Work
+## Next Leadership Action
 
-| Item | Owner | Status |
-|---|---|---|
-| Collaboration contracts | Product + CTO | drafted |
-| Runtime writeback for session reports | Runtime | working |
-| Handoff contract integration | Runtime | working |
-| Dashboard derived from artifacts | Runtime | working via CLI |
-| Sandbox system-test loop | Runtime | working |
-
-## Recent Decisions
-
-- Keep current execution kernel.
-- Restore the old `MyTeam` control rhythm.
-- Use `leadership_brief` before worker execution when user intent is raw.
-- Use structured JSON artifacts first, markdown summaries second.
-
-## Session Boot Reminder
-
-```text
-Read ONBOARDING.md -> confirm role -> read task/report/handoff -> work -> write report/handoff
-```
+- Review live dashboard before opening more worker sessions.
+- Approve only small, scoped tasks that preserve role boundaries.
+- Re-run `audit`, `prompt-sandbox`, and `system-test` after orchestration or workflow changes.
